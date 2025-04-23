@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards Recouvrement (Choix Ordre)</title>
+    <title>Flashcards)</title>
     <style>
-        /* --- CSS --- */
+        /* --- CSS (Identique à la version précédente) --- */
         body {
             font-family: sans-serif;
             line-height: 1.6;
@@ -22,11 +22,10 @@
             color: #333;
             border-bottom: 2px solid #0056b3;
             padding-bottom: 10px;
-            margin-bottom: 20px; /* Réduit */
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        /* Conteneur pour les options de démarrage */
         #setup-screen {
             background-color: #fff;
             border: 1px solid #ccc;
@@ -35,130 +34,41 @@
             width: 90%;
             max-width: 650px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: left; /* Alignement gauche pour les options */
-            margin-bottom: 30px;
-        }
-        #setup-screen h2 {
-            margin-top: 0;
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        .setup-option {
-            margin-bottom: 15px;
-        }
-        .setup-option label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .setup-option input[type="radio"],
-        .setup-option input[type="checkbox"] {
-            margin-right: 8px;
-        }
-        .setup-option .section-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            padding: 10px;
-            background-color: #fdfdfd;
-            border-radius: 4px;
-        }
-        .setup-option .section-list label {
-            font-weight: normal; /* Labels normaux pour les sections */
-            display: block; /* Chaque section sur sa ligne */
-            margin-bottom: 3px;
-        }
-        #start-session-btn {
-            display: block;
-            margin: 20px auto 0 auto; /* Centre le bouton */
-            background-color: #28a745;
-            color: white;
-            padding: 10px 30px;
-        }
-        #start-session-btn:hover {
-            background-color: #218838;
-        }
-
-
-        /* Conteneur principal pour la carte et les listes */
-        .main-content {
-            width: 90%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .main-content.hidden { /* Cache tout le contenu principal */
-             display: none !important;
-        }
-
-
-        #flashcard-container {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 25px;
-            width: 100%;
-            max-width: 650px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-top: 0; /* Pas de marge haute quand affiché */
-            margin-bottom: 30px;
-            box-sizing: border-box;
-        }
-
-        #flashcard-container.hidden {
-            display: none !important; /* Cache spécifiquement la carte si besoin */
-        }
-
-        #status-bar {
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            color: #555;
-            background-color: #e9ecef;
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid #ced4da;
-        }
-
-        #card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 25px;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-bottom: 25px;
-            box-sizing: border-box;
-        }
-
-        #question-area {
-            font-weight: bold;
-            color: #0056b3;
-            margin-bottom: 15px;
-            font-size: 1.15em;
-        }
-
-        #answer-area {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px dashed #ccc;
-            color: #333;
             text-align: left;
-            font-size: 1em;
-            word-wrap: break-word;
+            margin-bottom: 30px;
         }
+        #setup-screen h2 { margin-top: 0; text-align: center; color: #0056b3; margin-bottom: 20px; }
+        .setup-section { border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
+        .setup-section:first-child { border-top: none; margin-top: 0; padding-top: 0;} /* Pas de bordure/marge pour la 1ere section */
+         .setup-section h3 { margin-top: 0; margin-bottom: 15px; color: #333; text-align: center; font-size: 1.1em; }
+        .setup-option { margin-bottom: 15px; }
+        .setup-option label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .setup-option input[type="radio"], .setup-option input[type="checkbox"] { margin-right: 8px; vertical-align: middle; }
+        .setup-option .section-list { max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; background-color: #fdfdfd; border-radius: 4px; }
+        .setup-option .section-list label { font-weight: normal; display: block; margin-bottom: 3px; }
+        .setup-option .section-list label input { margin-right: 5px; }
+        .start-button-container { text-align: center; margin-top: 20px; }
+        .start-button-container button { margin: 5px 10px; padding: 10px 20px; }
+        #start-session-btn { background-color: #28a745; color: white; }
+        #start-session-btn:hover { background-color: #218838; }
+        #start-consult-btn { background-color: #17a2b8; color: white; }
+        #start-consult-btn:hover { background-color: #138496; }
 
-        #answer-area ul,
-        #answer-area ol {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            margin-left: 20px;
-            padding-left: 20px;
-        }
+        .main-content { width: 90%; max-width: 800px; display: flex; flex-direction: column; align-items: center; }
+        .main-content.hidden { display: none !important; }
+
+        #flashcard-container { background-color: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 25px; width: 100%; max-width: 650px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; margin-top: 0; margin-bottom: 30px; box-sizing: border-box; }
+        #flashcard-container.hidden { display: none !important; }
+
+        #status-bar { margin-bottom: 20px; font-size: 0.9em; color: #555; background-color: #e9ecef; padding: 8px 12px; border-radius: 4px; border: 1px solid #ced4da; }
+        #status-bar .quiz-info, #status-bar .consult-info { display: inline; }
+        .mode-consultation #status-bar .quiz-info { display: none; }
+        .mode-quiz #status-bar .consult-info { display: none; }
+
+        #card { background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; padding: 25px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; margin-bottom: 25px; box-sizing: border-box; }
+        #question-area { font-weight: bold; color: #0056b3; margin-bottom: 15px; font-size: 1.15em; }
+        #answer-area { margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc; color: #333; text-align: left; font-size: 1em; word-wrap: break-word; }
+        #answer-area ul, #answer-area ol { margin-top: 10px; margin-bottom: 10px; margin-left: 20px; padding-left: 20px; }
         #answer-area li { margin-bottom: 8px; }
         #answer-area strong { font-weight: bold; }
         #answer-area em, #answer-area i { font-style: italic; color: #555; }
@@ -166,27 +76,14 @@
         #answer-area code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
         #answer-area pre { background-color: #e9ecef; padding: 10px; border-radius: 4px; overflow-x: auto; }
 
-        #controls {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
+        #controls { margin-top: 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
         #feedback-buttons { display: flex; justify-content: center; gap: 15px; }
+        #consult-nav-buttons { display: flex; justify-content: space-between; gap: 15px; width: 80%; margin: 0 auto; }
 
         .hidden { display: none !important; }
-
-        button {
-            padding: 12px 25px;
-            font-size: 1em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-        }
+        button { padding: 12px 25px; font-size: 1em; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s ease; }
         button:active { transform: scale(0.98); }
+        button:disabled { background-color: #adb5bd; cursor: not-allowed; }
 
         #show-answer-btn { background-color: #007bff; color: white; }
         #show-answer-btn:hover { background-color: #0056b3; }
@@ -195,36 +92,21 @@
         #incorrect-btn { background-color: #dc3545; color: white; }
         #incorrect-btn:hover { background-color: #c82333; }
 
-        #tracking-lists-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 20px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+        #prev-btn, #next-btn { background-color: #6c757d; color: white; padding: 10px 20px;}
+        #prev-btn:hover, #next-btn:hover { background-color: #5a6268; }
 
-        .list-section {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 15px;
-            flex-basis: 45%;
-            flex-grow: 1;
-            box-sizing: border-box;
-            min-width: 250px;
-        }
+        .mode-consultation #feedback-buttons, .mode-consultation #show-answer-btn { display: none !important; }
+        .mode-quiz #consult-nav-buttons, .mode-quiz #show-answer-consult-btn { display: none !important; }
 
-        .list-section h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            color: #495057;
-            border-bottom: 1px solid #ced4da;
-            padding-bottom: 5px;
-        }
+        #show-answer-consult-btn { background-color: #007bff; color: white; }
+        #show-answer-consult-btn:hover { background-color: #0056b3; }
 
+
+        #tracking-lists-container { display: flex; flex-direction: row; justify-content: space-around; width: 100%; margin-top: 20px; gap: 20px; flex-wrap: wrap; }
+        .mode-consultation #tracking-lists-container { display: none !important; }
+
+        .list-section { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; flex-basis: 45%; flex-grow: 1; box-sizing: border-box; min-width: 250px; }
+        .list-section h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.1em; color: #495057; border-bottom: 1px solid #ced4da; padding-bottom: 5px; }
         .list-section ul { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; }
         .list-section li { font-size: 0.85em; padding: 5px 8px; border-bottom: 1px dotted #e0e0e0; color: #6c757d; word-wrap: break-word; cursor: pointer; transition: background-color 0.2s ease; }
         .list-section li:hover { background-color: #e9ecef; }
@@ -232,21 +114,13 @@
         #validated-list-container h3 { color: #28a745; }
         #to-review-list-container h3 { color: #dc3545; }
 
-        #completion-message {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            border-radius: 5px;
-            text-align: center;
-            width: 90%;
-            max-width: 650px;
-            box-sizing: border-box;
-        }
+        #completion-message { margin-top: 30px; padding: 20px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px; text-align: center; width: 90%; max-width: 650px; box-sizing: border-box; }
         #completion-message.hidden { display: none; }
         #restart-btn { background-color: #ffc107; color: #333; margin-top: 15px; display: inline-block; }
         #restart-btn:hover { background-color: #e0a800; }
+
+         #back-to-menu-btn { background-color:#6c757d; color:white; margin-top: 20px; }
+         #back-to-menu-btn:hover { background-color: #5a6268; }
 
         @media (max-width: 600px) {
             body { padding: 10px; }
@@ -259,7 +133,7 @@
             #answer-area { font-size: 0.95em; }
             button { padding: 10px 18px; font-size: 0.9em; }
             #controls { gap: 10px; }
-            #feedback-buttons { gap: 10px; }
+            #feedback-buttons, #consult-nav-buttons { gap: 10px; width: 95%; }
             #tracking-lists-container { flex-direction: column; align-items: center; gap: 15px; }
             .list-section { flex-basis: 90%; width: 100%; }
         }
@@ -267,75 +141,81 @@
 </head>
 <body>
 
-    <h1>Flashcards Recouvrement Créances Publiques</h1>
+    <h1>Flashcards</h1>
 
     <!-- Écran de configuration -->
     <div id="setup-screen">
-        <h2>Options de la session</h2>
-        <div class="setup-option">
-            <label>Ordre des questions :</label>
-            <label><input type="radio" name="order" value="random" checked> Aléatoire</label>
-            <label><input type="radio" name="order" value="chrono"> Chronologique</label>
-            <label><input type="radio" name="order" value="section"> Par Section(s)</label>
-        </div>
-
-        <div class="setup-option hidden" id="section-selector-container">
-            <label>Choisir les sections :</label>
-            <div class="section-list" id="section-checkboxes">
-                <!-- Checkboxes générées par JS -->
-                Chargement des sections...
+        <h2>Choisir le mode</h2>
+        <div class="setup-section">
+            <h3>Mode Quiz (Apprentissage)</h3>
+            <div class="setup-option">
+                <label>Ordre des questions :</label>
+                <label><input type="radio" name="order" value="random" checked> Aléatoire</label>
+                <label><input type="radio" name="order" value="chrono"> Chronologique</label>
+                <label><input type="radio" name="order" value="section"> Par Section(s)</label>
             </div>
-             <label style="margin-top: 10px;"><input type="checkbox" id="shuffle-sections"> Mélanger les questions au sein des sections sélectionnées</label>
+            <div class="setup-option hidden" id="section-selector-container">
+                <label>Choisir les sections :</label>
+                <div class="section-list" id="section-checkboxes">Chargement...</div>
+                <label style="margin-top: 10px;"><input type="checkbox" id="shuffle-sections"> Mélanger les questions au sein des sections</label>
+            </div>
+            <div class="start-button-container">
+                <button id="start-session-btn" class="start-btn">Commencer le Quiz</button>
+            </div>
         </div>
-
-        <button id="start-session-btn">Commencer la session</button>
+         <div class="setup-section">
+             <h3>Mode Consultation (Parcourir)</h3>
+              <p style="text-align: center; font-size: 0.9em; color: #6c757d;">Parcourez toutes les cartes dans l'ordre.</p>
+             <div class="start-button-container">
+                <button id="start-consult-btn" class="start-btn">Consulter les cartes</button>
+             </div>
+         </div>
     </div>
 
-
-    <!-- Contenu principal (Flashcard + Listes) -->
+    <!-- Contenu principal (Flashcard + Listes), initialement caché -->
     <div class="main-content hidden">
-
         <div id="flashcard-container">
             <div id="status-bar">
-                Questions restantes : <span id="remaining-count">0</span> | Total initial : <span id="total-count">0</span>
+                <span class="quiz-info">Questions restantes: <span id="remaining-count">0</span> | Total: <span id="total-count">0</span></span>
+                <span class="consult-info">Carte <span id="current-card-num">0</span> / <span id="total-cards-consult">0</span></span>
             </div>
             <div id="card">
                 <div id="question-area"></div>
                 <div id="answer-area" class="hidden"></div>
             </div>
             <div id="controls">
+                <!-- Quiz -->
                 <button id="show-answer-btn">Afficher la réponse</button>
                 <div id="feedback-buttons" class="hidden">
                     <button id="correct-btn">Correct 👍</button>
                     <button id="incorrect-btn">Incorrect 👎</button>
                 </div>
+                <!-- Consultation -->
+                 <button id="show-answer-consult-btn" class="hidden">Afficher la réponse</button>
+                <div id="consult-nav-buttons" class="hidden">
+                    <button id="prev-btn">Précédent</button>
+                    <button id="next-btn">Suivant</button>
+                </div>
             </div>
         </div>
-
+        <!-- Listes (Quiz seulement) -->
         <div id="tracking-lists-container">
-            <div id="validated-list-container" class="list-section">
-                <h3>Questions Validées</h3>
-                <ul id="validated-list"></ul>
-            </div>
-            <div id="to-review-list-container" class="list-section">
-                <h3>Questions à Revoir</h3>
-                <ul id="to-review-list"></ul>
-            </div>
+            <div id="validated-list-container" class="list-section"><h3>Validées</h3><ul id="validated-list"></ul></div>
+            <div id="to-review-list-container" class="list-section"><h3>À Revoir</h3><ul id="to-review-list"></ul></div>
         </div>
-
+        <!-- Fin Quiz -->
         <div id="completion-message" class="hidden">
-            🎉 Félicitations ! Vous avez terminé toutes les questions. 🎉
+            🎉 Félicitations ! Vous avez terminé toutes les questions du quiz. 🎉
             <button id="restart-btn">Nouvelle Session</button>
         </div>
-
+        <!-- Retour Menu (pour les 2 modes une fois terminés ou en consultation) -->
+        <button id="back-to-menu-btn" class="hidden">Retour au menu</button>
     </div>
 
-
     <script>
-        // --- Données (Ajout de la propriété 'section') ---
+        // --- Données (flashcardsData) ---
         const flashcardsData = [
-            // Chapitre: Principes Généraux
-            // Section: Droit Administratif Général
+             // --- Chapitre: Principes Généraux ---
             { section: "Admin Général - Privilège Préalable", q: '<strong>Question 1 :</strong> Qu\'est-ce que le "privilège du préalable" dont bénéficie l\'administration en matière de recouvrement ?', a: '<strong>Réponse :</strong> C\'est la possibilité pour l\'administration de prendre des décisions exécutoires qui s\'imposent aux administrés sans avoir besoin de saisir préalablement un juge. Ces décisions créent unilatéralement des obligations.' },
             { section: "Admin Général - Privilège Préalable", q: '<strong>Question 2 :</strong> Quelle est la différence entre l\'autorité de la chose décidée et l\'autorité de la chose jugée ?', a: '<strong>Réponse :</strong> L\'autorité de la chose décidée concerne la capacité d\'une décision administrative à s\'imposer et à être exécutée dès son édiction. L\'autorité de la chose jugée concerne l\'irrévocabilité d\'une décision de justice et sa force exécutoire après jugement. La décision administrative n\'a pas la même force que la décision de justice.' },
             { section: "Admin Général - Privilège Préalable", q: '<strong>Question 3 :</strong> Quelle jurisprudence consacre la faculté d\'émettre une décision exécutoire comme un privilège fondamental de l\'administration ?', a: '<strong>Réponse :</strong> CE, Ass, 2 juillet 1982, <em>Huglo et Lepage-Jessua.</em>' },
@@ -352,7 +232,6 @@
             { section: "Admin Général - Insaisissabilité", q: '<strong>Question 14 :</strong> Quels sont les principaux textes qui fondent le principe d\'insaisissabilité des biens publics ?', a: '<strong>Réponse :</strong> L\'<strong>Article 537 du Code Civil</strong>, la <strong>Loi du 9 juillet 1991</strong> sur la réforme des procédures civiles d\'exécution (qui exclut les personnes bénéficiant d\'une immunité d\'exécution), et l\'article <strong>L2311-1 du Code général de la propriété des personnes publiques (CG3P)</strong> qui pose explicitement que les biens des personnes publiques mentionnées à l\'article L. 1 sont insaisissables.' },
             { section: "Admin Général - Insaisissabilité", q: '<strong>Question 15 :</strong> Le principe d\'insaisissabilité s\'applique-t-il uniquement aux biens du domaine public ?', a: '<strong>Réponse :</strong> Non, il s\'applique aussi aux propriétés qui relèvent du <strong>domaine privé</strong> des personnes publiques.' },
             { section: "Admin Général - Insaisissabilité", q: '<strong>Question 16 :</strong> Quelle est la justification traditionnelle de ce principe d\'insaisissabilité ?', a: '<strong>Réponse :</strong> Les personnes publiques sont réputées comme étant <strong>toujours solvables</strong> par principe.' },
-            // Section: Comptabilité Publique
             { section: "Compta Publique - Principes", q: '<strong>Question 17 :</strong> Quel texte majeur régit la gestion budgétaire et comptable publique (GBCP) ?', a: '<strong>Réponse :</strong> Le <strong>Décret n° 2012-1246 du 7 novembre 2012</strong> relatif à la gestion budgétaire et comptable publique.' },
             { section: "Compta Publique - Principes", q: '<strong>Question 18 :</strong> Quel est l\'objectif principal des règles de la comptabilité publique ?', a: '<strong>Réponse :</strong> La <strong>préservation des fonds publics</strong> (deniers publics).' },
             { section: "Compta Publique - Séparation Ordo/Compta", q: '<strong>Question 19 :</strong> Quel est le principe fondamental qui organise les fonctions financières au sein des organismes publics ?', a: '<strong>Réponse :</strong> Le principe de <strong>séparation des fonctions d\'ordonnateur et de comptable public</strong>.' },
@@ -380,8 +259,6 @@
             { section: "Compta Publique - Exécution Recette", q: '<strong>Question 41 :</strong> Quelles sont les deux opérations principales de la phase comptable du recouvrement ?', a: '<strong>Réponse :</strong> 1. Une opération de <strong>contrôle de la régularité</strong> de la recette. 2. Une opération <strong>matérielle de recouvrement</strong>.' },
             { section: "Compta Publique - Exécution Recette", q: '<strong>Question 42 :</strong> Quels contrôles le comptable effectue-t-il sur la recette (Article 19 GBCP) ?', a: '<strong>Réponse :</strong> Il contrôle la <strong>régularité de l\'autorisation de percevoir</strong> la recette, la mise en recouvrement (dans la limite des éléments dont il dispose), et la régularité des réductions/annulations. Il vérifie notamment que la perception a été autorisée (ex: par la loi de finances) et que la recette a une base juridique réelle.' },
             { section: "Compta Publique - Exécution Recette", q: '<strong>Question 43 :</strong> En quoi consiste l\'opération matérielle de recouvrement par le comptable ?', a: '<strong>Réponse :</strong> Elle consiste à <strong>notifier les ordres de recouvrer</strong> au débiteur et, si celui-ci ne s\'exécute pas, à engager les procédures de <strong>recouvrement forcé</strong>.' },
-            // Chapitre: Créances Considérées
-            // Section: Nature des Créances
             { section: "Nature Créances - Général", q: '<strong>Question 44 :</strong> De quelle nature sont les créances publiques ?', a: '<strong>Réponse :</strong> Ce sont des <strong>droits pécuniaires</strong> au profit des organismes publics, qui constituent leurs recettes.' },
             { section: "Nature Créances - Général", q: '<strong>Question 45 :</strong> Comment peut-on qualifier les créances non-fiscales ?', a: '<strong>Réponse :</strong> Elles sont aussi appelées créances <strong>étrangères à l\'impôt et au domaine</strong>, "autres créances" ou "créances ordinaires des personnes publiques".' },
             { section: "Nature Créances - Fiscales", q: '<strong>Question 46 :</strong> Quels sont les deux types exclusifs de prélèvements obligatoires constituant des créances fiscales ?', a: '<strong>Réponse :</strong> L\'<strong>impôt</strong> et la <strong>taxe</strong>.' },
@@ -395,9 +272,6 @@
             { section: "Nature Créances - Général", q: '<strong>Question 54 :</strong> Le régime juridique du recouvrement est-il parfaitement homogène pour toutes les créances publiques ?', a: '<strong>Réponse :</strong> Non, il existe des différences importantes, notamment entre créances fiscales et non-fiscales, et selon que la personne publique créancière est l\'État ou une collectivité territoriale.' },
             { section: "Nature Créances - Dette Publique", q: '<strong>Question 55 :</strong> Quel principe majeur fait obstacle au recouvrement forcé par un créancier (particulier, entreprise) contre une personne publique ?', a: '<strong>Réponse :</strong> Le principe d\'<strong>insaisissabilité</strong> des deniers publics.' },
             { section: "Nature Créances - Dette Publique", q: '<strong>Question 56 :</strong> Existe-t-il des procédures alternatives pour obtenir le paiement d\'une créance sur une personne publique ?', a: '<strong>Réponse :</strong> Oui, il existe des procédures spécifiques de droit public (vues plus loin : mandatement d\'office, inscription d\'office, référé-provision) qui peuvent être aussi efficaces que les voies d\'exécution de droit commun.' },
-            // Chapitre: Personne Publique Créancière
-            // Section: Procédures Recouvrement
-            // Subsection: Autorités Émettrices
             { section: "Proc Recouv - Autorités", q: '<strong>Question 57 :</strong> Qui prescrit l\'exécution des recettes et des dépenses selon l\'article 10 du décret de 2012 ?', a: '<strong>Réponse :</strong> Les <strong>ordonnateurs</strong> (principaux ou secondaires).' },
             { section: "Proc Recouv - Autorités", q: '<strong>Question 58 :</strong> Les ordonnateurs peuvent-ils déléguer leur signature ?', a: '<strong>Réponse :</strong> Oui, ils peuvent déléguer leur signature et se faire suppléer.' },
             { section: "Proc Recouv - Autorités (Non-Fiscal)", q: '<strong>Question 59 :</strong> Quel est l\'acte typique émis pour le recouvrement de la plupart des créances non-fiscales ?', a: '<strong>Réponse :</strong> Le <strong>titre de perception exécutoire</strong> (ou "état exécutoire").' },
@@ -419,7 +293,6 @@
             { section: "Proc Recouv - Autorités (Fiscal)", q: '<strong>Question 75 :</strong> Comment appelle-t-on le système où l\'administration liquide l\'impôt à partir des informations fournies ?', a: '<strong>Réponse :</strong> Le système des <strong>droits constatés</strong>.' },
             { section: "Proc Recouv - Autorités (Fiscal)", q: '<strong>Question 76 :</strong> Pour quels types d\'impôts la liquidation revient-elle directement au redevable ?', a: '<strong>Réponse :</strong> Pour les impôts ne faisant pas l\'objet d\'un rôle, comme l\'<strong>impôt sur les sociétés</strong> ou la <strong>TVA</strong> et autres impôts indirects. Le redevable calcule et paie spontanément.' },
             { section: "Proc Recouv - Autorités (Fiscal)", q: '<strong>Question 77 :</strong> Si le contribuable ne paie pas spontanément un impôt liquidé par lui-même, quel acte l\'administration émettra-t-elle ?', a: '<strong>Réponse :</strong> Elle émettra un <strong>avis de mise en recouvrement</strong>.' },
-            // Subsection: Actes Émis
             { section: "Proc Recouv - Actes (Non-Fiscal)", q: '<strong>Question 78 :</strong> Quelles informations essentielles doivent contenir les titres exécutoires et arrêtés de débets ?', a: '<strong>Réponse :</strong> Toutes les informations permettant d\'identifier clairement l\'<strong>objet de la créance</strong> (motivation) et l\'<strong>identité exacte du redevable</strong>.' },
             { section: "Proc Recouv - Actes (Non-Fiscal)", q: '<strong>Question 79 :</strong> Les bases de la liquidation doivent-elles obligatoirement être mentionnées sur le titre ? Qu\'implique l\'article 24 du décret de 2012 ?', a: '<strong>Réponse :</strong> Oui, l\'article 24 du décret de 2012 impose que <strong>toute créance liquidée faisant l\'objet d\'un ordre de recouvrer indique les bases de la liquidation</strong>. Une erreur de liquidation doit donner lieu à un ordre d\'annulation ou de réduction indiquant les bases de la nouvelle liquidation. Une régularisation <em>a posteriori</em> des bases n\'est pas possible si elles étaient absentes initialement (cf. jurisprudence Moine, octobre 1997, mentionnée implicitement).' },
             { section: "Proc Recouv - Actes (Non-Fiscal)", q: '<strong>Question 80 :</strong> Quelle est la force principale d\'un titre de perception exécutoire ?', a: '<strong>Réponse :</strong> Il a <strong>force exécutoire</strong> dès son émission (Loi du 31 décembre 1992).' },
@@ -442,7 +315,6 @@
             { section: "Proc Recouv - Actes (Fiscal)", q: '<strong>Question 97 :</strong> Qui signe et rend exécutoire l\'AMR ?', a: '<strong>Réponse :</strong> Le directeur des services fiscaux (ou autorité compétente).' },
             { section: "Proc Recouv - Actes (Fiscal)", q: '<strong>Question 98 :</strong> Quelles sont les mentions obligatoires d\'un AMR ?', a: '<strong>Réponse :</strong> Identification du débiteur, justification de la créance (base légale, calcul), description des sommes dues (principal, pénalités).' },
             { section: "Proc Recouv - Actes (Fiscal)", q: '<strong>Question 99 :</strong> Quelle est la conséquence d\'une irrégularité de forme de l\'AMR ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> L\'irrégularité (ex: absence de motivation suffisante) entraîne la <strong>décharge de l\'intégralité des droits</strong> réclamés. CE 30 octobre 1989, <em>société de crédit.</em>' },
-            // Subsection: Exécution des Actes
             { section: "Exécution Actes - Non-Fiscal", q: '<strong>Question 100 :</strong> À qui incombe l\'exécution du titre de perception exécutoire ?', a: '<strong>Réponse :</strong> Au <strong>comptable public assignataire</strong> du titre (celui dans les écritures duquel la créance est enregistrée).' },
             { section: "Exécution Actes - Non-Fiscal", q: '<strong>Question 101 :</strong> Que se passe-t-il si le comptable obtient l\'admission en non-valeur de la créance ?', a: '<strong>Réponse :</strong> Il est déchargé de son obligation de poursuivre le recouvrement, mais la créance ne disparaît pas pour le débiteur.' },
             { section: "Exécution Actes - Non-Fiscal", q: '<strong>Question 102 :</strong> Quels contrôles le comptable doit-il effectuer avant de prendre en charge un titre de perception (cf. Article 19 GBCP) ?', a: '<strong>Réponse :</strong> Il doit vérifier :<ul><li>a) La régularité de l\'autorisation de percevoir la recette ;</li><li>b) La régularité de la mise en recouvrement (existence d\'une base juridique, compétence de l\'ordonnateur, bases de liquidation, etc.) dans la limite des éléments dont il dispose.</li></ul>' },
@@ -477,8 +349,6 @@
             { section: "Exécution Actes - Fiscal", q: '<strong>Question 131 :</strong> Quelle garantie le Trésor possède-t-il sur les biens immeubles du débiteur ? S\'applique-t-elle aux tiers ?', a: '<strong>Réponse :</strong> Une <strong>hypothèque légale</strong> sur tous les immeubles du redevable. Elle s\'applique aussi aux immeubles des tiers tenus solidairement ou responsables (ex: sur un immeuble commun pour une dette fiscale d\'un époux).' },
             { section: "Exécution Actes - Fiscal", q: '<strong>Question 132 :</strong> Le recouvrement de l\'impôt peut-il mettre en cause des tiers solidairement responsables ? Donnez des exemples légaux.', a: '<strong>Réponse :</strong> Oui. Exemples : <strong>Solidarité entre époux</strong> (Art 1685 CGI) ; <strong>Solidarité des cessionnaires de fonds de commerce</strong> (Art 1684-1 CGI).' },
             { section: "Exécution Actes - Fiscal", q: '<strong>Question 133 :</strong> Dans quel cas un dirigeant de société peut-il être déclaré solidairement responsable des dettes fiscales de la société ? (Article L267 LPF)', a: '<strong>Réponse :</strong> Lorsque, par ses <strong>manœuvres frauduleuses</strong> ou l\'<strong>inobservation grave et répétée des obligations fiscales</strong>, il a rendu impossible le recouvrement des impôts et pénalités dus par la société. La décision est prise par le président du tribunal judiciaire saisi par le comptable public.' },
-            // Section: Voies de Droit du Débiteur
-            // Subsection: Non Juridictionnelles
             { section: "Voies Droit - Non Jurid - Remise Gracieuse", q: '<strong>Question 134 :</strong> Qu\'est-ce qu\'une remise gracieuse ?', a: '<strong>Réponse :</strong> C\'est une <strong>libéralité</strong> accordée par l\'administration à un débiteur, consistant en une réduction totale ou partielle de sa dette (principal, pénalités, intérêts), généralement pour des motifs liés à sa situation financière difficile (gêne, précarité). Elle doit être demandée par le débiteur.' },
             { section: "Voies Droit - Non Jurid - Remise Gracieuse", q: '<strong>Question 135 :</strong> Qui est compétent pour accorder une remise gracieuse pour une créance étatique non-fiscale ? (Article 120 décret 2012)', a: '<strong>Réponse :</strong> Le <strong>ministre chargé du budget</strong> ou, par délégation, le <strong>comptable public</strong> chargé du recouvrement (dans certaines limites de montant). Au-delà d\'un certain seuil, l\'avis (simple) du Conseil d\'État peut être requis.' },
             { section: "Voies Droit - Non Jurid - Remise Gracieuse", q: '<strong>Question 136 :</strong> Qui est compétent pour une créance d\'une collectivité territoriale ?', a: '<strong>Réponse :</strong> L\'<strong>assemblée délibérante</strong> de la collectivité (ou de l\'établissement public local), en raison de sa compétence budgétaire (L1612 CGCT).' },
@@ -509,7 +379,6 @@
             { section: "Voies Droit - Non Jurid - Recours Admin", q: '<strong>Question 161 :</strong> En matière de créances non-fiscales des collectivités territoriales, une réclamation préalable est-elle obligatoire pour contester le bien-fondé de la créance ? Pour contester un acte de poursuite ? (L1617-5 CGCT)', a: '<strong>Réponse :</strong><ul><li>Pour contester le <strong>bien-fondé</strong> de la créance : <strong>Non</strong>, l\'action directe devant le juge compétent est possible dans les 2 mois de la réception du titre ou du premier acte de poursuite.</li><li>Pour contester la <strong>régularité d\'un acte de poursuite</strong> : <strong>Oui</strong>, la réclamation préalable est obligatoire selon les modalités de l\'article L. 281 LPF.</li></ul>' },
             { section: "Voies Droit - Non Jurid - Recours Admin", q: '<strong>Question 162 :</strong> En matière de créances non-fiscales de l\'État, une réclamation préalable est-elle obligatoire avant de saisir le juge ? (Article 118 décret 2012)', a: '<strong>Réponse :</strong> Oui, <strong>avant de saisir la juridiction compétente</strong>, le redevable doit adresser une <strong>réclamation préalable</strong> au comptable chargé du recouvrement.' },
             { section: "Voies Droit - Non Jurid - Recours Admin", q: '<strong>Question 163 :</strong> Dans quels délais cette réclamation doit-elle être déposée (sous peine de nullité) ? (Article 118 décret 2012)', a: '<strong>Réponse :</strong><ul><li>En cas d\'<strong>opposition à l\'exécution</strong> d\'un titre de perception (contestation de l\'existence, montant, exigibilité) : dans les <strong>deux mois</strong> suivant la notification du titre ou du premier acte de poursuite.</li><li>En cas d\'<strong>opposition à poursuites</strong> (contestation de la régularité formelle d\'un acte de poursuite) : dans les <strong>deux mois</strong> suivant la notification de cet acte.</li></ul>' },
-            // Subsection: Juridictionnelles
             { section: "Voies Droit - Jurid - Non-Fiscal (Titre)", q: '<strong>Question 164 :</strong> Quel est l\'effet de l\'introduction d\'une demande en justice contre un titre exécutoire non-fiscal ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Les titres <strong>cessent d\'être exécutoires</strong> dès l\'introduction de la demande tendant à leur annulation (ou à la décharge de l\'obligation). CE, 19 juin 1985, <em>Commune des Angles c/ Scté Areny frères.</em> L\'opposition fait disparaître le titre, le débat porte sur la créance elle-même.' },
             { section: "Voies Droit - Jurid - Non-Fiscal (Titre)", q: '<strong>Question 165 :</strong> Le recours contre un titre de perception exécutoire devant le juge administratif est-il suspensif ?', a: '<strong>Réponse :</strong> Oui, en principe, l\'opposition à l\'exécution (contestation de la créance) a un <strong>effet suspensif</strong> en première instance, basé sur la jurisprudence du CE (confirmé implicitement par Art 117 décret 2012 pour certains titres émis sous L.252A LPF).' },
             { section: "Voies Droit - Jurid - Non-Fiscal (Titre)", q: '<strong>Question 166 :</strong> Le recours en appel devant la Cour Administrative d\'Appel a-t-il un effet suspensif ? Qu\'en est-il du pourvoi en cassation ? (CE, 5 mai 1995, SARL Fromarsac)', a: '<strong>Réponse :</strong> L\'appel devant la CAA <strong>n\'est pas suspensif</strong> (contrairement à l\'appel judiciaire). Le pourvoi en cassation devant le CE n\'est <strong>pas non plus suspensif</strong>.' },
@@ -537,7 +406,6 @@
             { section: "Voies Droit - Jurid - Fiscal (Recouvrement)", q: '<strong>Question 188 :</strong> Une réclamation préalable est-elle obligatoire pour contester un acte de recouvrement fiscal ? (L281 LPF)', a: '<strong>Réponse :</strong> Oui, la contestation doit d\'abord être adressée à l\'<strong>administration dont dépend le comptable</strong> qui exerce les poursuites.' },
             { section: "Voies Droit - Jurid - Fiscal (Recouvrement)", q: '<strong>Question 189 :</strong> Dans quel délai cette réclamation doit-elle être formée ? (R281-3-1 LPF)', a: '<strong>Réponse :</strong> Dans un délai de <strong>deux mois</strong> à partir de la notification de l\'acte contesté.' },
             { section: "Voies Droit - Jurid - Fiscal (Recouvrement)", q: '<strong>Question 190 :</strong> Quel juge est compétent pour connaître des contestations portant sur la régularité formelle d\'un acte de poursuite ? Sur l\'obligation au paiement ou l\'exigibilité ?', a: '<strong>Réponse :</strong> Le <strong>juge de l\'exécution (JEX)</strong> pour la régularité formelle des actes de poursuite. Le <strong>juge de l\'impôt</strong> (administratif ou judiciaire selon la nature de l\'impôt) pour les contestations sur l\'obligation de payer, le montant ou l\'exigibilité.' },
-            // Chapitre: Personne Publique Débitrice
             { section: "Pers Pub Débitrice - Paiement (Général)", q: '<strong>Question 191 :</strong> Pourquoi le créancier d\'une collectivité territoriale (CT) ne peut-il pas se fonder uniquement sur l\'inscription de sa créance au budget pour en exiger le paiement ?', a: '<strong>Réponse :</strong> Parce que l\'inscription au budget n\'est qu\'une <strong>autorisation de dépenser</strong> et n\'ouvre pas de droit direct au profit des créanciers. Le paiement nécessite un <strong>mandatement</strong> (ou ordonnancement) par l\'ordonnateur.' },
             { section: "Pers Pub Débitrice - Paiement (Obligatoire)", q: '<strong>Question 192 :</strong> Quelle est la définition légale d\'une dépense obligatoire pour une collectivité territoriale ? (Article L1612-15 al 1er CGCT)', a: '<strong>Réponse :</strong> Ce sont :<ol><li>Les dépenses nécessaires à l\'<strong>acquittement des dettes exigibles</strong>.</li><li>Les dépenses pour lesquelles <strong>la loi l\'a expressément décidé</strong>.</li></ol>' },
             { section: "Pers Pub Débitrice - Paiement (Obligatoire)", q: '<strong>Question 193 :</strong> Quelles sont les caractéristiques d\'une "dette exigible" au sens de cette disposition (jurisprudence) ?', a: '<strong>Réponse :</strong> La dette doit être : <strong>Échue</strong> (le terme est arrivé), <strong>Certaine</strong> (non sérieusement contestée dans son principe), <strong>Liquide</strong> (montant déterminé ou facilement déterminable), et issue d\'une source d\'obligation reconnue (loi, contrat, délit...). <em>CE, 8 décembre 2003, Commune de Maurepas</em> ; <em>CE, 17 décembre 2003, Scté Natexis-Banque Populaire.</em>' },
@@ -584,21 +452,31 @@
         const validatedListEl = document.getElementById('validated-list');
         const toReviewListEl = document.getElementById('to-review-list');
         const trackingListsContainerEl = document.getElementById('tracking-lists-container');
-        // NOUVEAU: Éléments de l'écran de configuration
         const setupScreenEl = document.getElementById('setup-screen');
-        const mainContentEl = document.querySelector('.main-content'); // Cible par classe
+        const mainContentEl = document.querySelector('.main-content');
         const sectionSelectorContainer = document.getElementById('section-selector-container');
         const sectionCheckboxesContainer = document.getElementById('section-checkboxes');
         const startSessionBtn = document.getElementById('start-session-btn');
         const shuffleSectionsCheckbox = document.getElementById('shuffle-sections');
-
+        const startConsultBtn = document.getElementById('start-consult-btn');
+        const consultNavButtons = document.getElementById('consult-nav-buttons');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentCardNumEl = document.getElementById('current-card-num');
+        const totalCardsConsultEl = document.getElementById('total-cards-consult');
+        const showAnswerConsultBtn = document.getElementById('show-answer-consult-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const bodyEl = document.body;
 
         let questionsToAsk = [];
         let currentQuestionGlobalIndex = -1;
         let originalTotal = 0;
         let validatedIndices = [];
         let toReviewIndices = [];
-        let uniqueSections = []; // Pour stocker les noms des sections
+        let uniqueSections = [];
+        let isConsultationMode = false;
+        let consultationCurrentIndex = 0;
+        let allCardIndices = [];
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -623,27 +501,22 @@
 
         function updateDisplayLists() {
             if (!validatedListEl || !toReviewListEl) return;
-
             validatedListEl.innerHTML = '';
             toReviewListEl.innerHTML = '';
-
             const sortedValidated = [...validatedIndices].sort((a,b) => a - b);
             sortedValidated.forEach(index => {
                 if (flashcardsData[index]) {
-                    const li = document.createElement('li');
-                    li.dataset.index = index;
+                    const li = document.createElement('li'); li.dataset.index = index;
                     li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`;
-                    li.title = `Section: ${flashcardsData[index].section || 'N/A'}`; // Tooltip pour la section
+                    li.title = `Section: ${flashcardsData[index].section || 'N/A'}`;
                     li.addEventListener('click', () => showQuestionDetails(index));
                     validatedListEl.appendChild(li);
                 }
             });
-
             const sortedToReview = [...toReviewIndices].sort((a,b) => a - b);
             sortedToReview.forEach(index => {
                  if (flashcardsData[index]) {
-                    const li = document.createElement('li');
-                    li.dataset.index = index;
+                    const li = document.createElement('li'); li.dataset.index = index;
                     li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`;
                     li.title = `Section: ${flashcardsData[index].section || 'N/A'}`;
                     li.addEventListener('click', () => showQuestionDetails(index));
@@ -652,64 +525,85 @@
             });
         }
 
-        function loadNextQuestion() {
+        function loadCard(globalIndex) {
             answerArea.classList.add('hidden');
             feedbackButtons.classList.add('hidden');
-            showAnswerBtn.classList.remove('hidden');
-            questionArea.innerHTML = "";
-            answerArea.innerHTML = "";
-            currentQuestionGlobalIndex = -1;
+            // On montrera le bon bouton "Afficher" plus tard selon le mode
+            showAnswerBtn.classList.add('hidden');
+            showAnswerConsultBtn.classList.add('hidden');
 
+
+            currentQuestionGlobalIndex = globalIndex;
+
+            if (globalIndex < 0 || globalIndex >= flashcardsData.length || !flashcardsData[globalIndex]) {
+                console.error(`ERREUR: Index (${globalIndex}) ou données invalides pour loadCard.`);
+                questionArea.innerHTML = "Erreur: Carte invalide.";
+                answerArea.innerHTML = "";
+                return false;
+            }
+
+            const cardData = flashcardsData[globalIndex];
+            if (cardData && cardData.q && cardData.a) {
+                questionArea.innerHTML = cardData.q;
+                answerArea.innerHTML = cardData.a;
+
+                 // Afficher le bouton "Afficher Réponse" approprié au mode
+                 if (isConsultationMode) {
+                     showAnswerConsultBtn.classList.remove('hidden');
+                 } else {
+                     showAnswerBtn.classList.remove('hidden');
+                 }
+
+                return true;
+            } else {
+                console.error("ERREUR: Données de carte invalides pour l'index", globalIndex, cardData);
+                questionArea.innerHTML = `Erreur: Données invalides pour carte #${globalIndex + 1}.`;
+                answerArea.innerHTML = "";
+                return false;
+            }
+        }
+
+        function updateStatus() {
+            if (isConsultationMode) {
+                if (currentCardNumEl && totalCardsConsultEl) {
+                    currentCardNumEl.textContent = consultationCurrentIndex + 1;
+                    totalCardsConsultEl.textContent = flashcardsData.length;
+                }
+            } else {
+                if (remainingCountEl && totalCountEl) {
+                    remainingCountEl.textContent = questionsToAsk.length;
+                    totalCountEl.textContent = originalTotal;
+                }
+            }
+        }
+
+        // --- Fonctions Mode Quiz ---
+        function loadNextQuizQuestion() {
             if (questionsToAsk.length === 0) {
                 flashcardContainerEl.classList.add('hidden');
                 trackingListsContainerEl.classList.remove('hidden');
                 completionMessageEl.classList.remove('hidden');
+                backToMenuBtn.classList.remove('hidden');
                 updateStatus();
                 return;
             }
 
+            // S'assurer que l'interface est correcte pour une nouvelle carte de quiz
             flashcardContainerEl.classList.remove('hidden');
             completionMessageEl.classList.add('hidden');
             trackingListsContainerEl.classList.remove('hidden');
+            backToMenuBtn.classList.add('hidden');
 
-            currentQuestionGlobalIndex = questionsToAsk[0];
-
-            if (typeof flashcardsData === 'undefined' || flashcardsData === null) {
-                 console.error("ERREUR: flashcardsData non défini.");
-                 questionArea.innerHTML = "Erreur: Données non chargées.";
-                 return;
-            }
-            if (currentQuestionGlobalIndex < 0 || currentQuestionGlobalIndex >= flashcardsData.length || flashcardsData[currentQuestionGlobalIndex] === undefined) {
-                console.error(`ERREUR: Index (${currentQuestionGlobalIndex}) ou données invalides.`);
-                questionArea.innerHTML = "Erreur: Index/Données invalides.";
-                questionsToAsk.shift();
-                setTimeout(loadNextQuestion, 50);
-                return;
-            }
-
-            const currentQuestionData = flashcardsData[currentQuestionGlobalIndex];
-
-            if (currentQuestionData && currentQuestionData.q && currentQuestionData.a) {
-                questionArea.innerHTML = currentQuestionData.q;
-                answerArea.innerHTML = currentQuestionData.a;
+            const success = loadCard(questionsToAsk[0]);
+            if (success) {
+                updateStatus();
             } else {
-                console.error("ERREUR: Données de carte invalides pour l'index", currentQuestionGlobalIndex, currentQuestionData);
-                questionArea.innerHTML = `Erreur: Données invalides pour carte ${currentQuestionGlobalIndex}.`;
                 questionsToAsk.shift();
-                setTimeout(loadNextQuestion, 50);
-                return;
-            }
-            updateStatus();
-        }
-
-        function updateStatus() {
-            if (remainingCountEl && totalCountEl) {
-                remainingCountEl.textContent = questionsToAsk.length;
-                totalCountEl.textContent = originalTotal;
+                setTimeout(loadNextQuizQuestion, 50);
             }
         }
 
-        function handleShowAnswer() {
+        function handleShowAnswer() { // Mode Quiz
             answerArea.classList.remove('hidden');
             showAnswerBtn.classList.add('hidden');
             feedbackButtons.classList.remove('hidden');
@@ -717,69 +611,67 @@
 
         function handleCorrect() {
             if (currentQuestionGlobalIndex === -1) return;
-
             const reviewIndex = toReviewIndices.indexOf(currentQuestionGlobalIndex);
-            if (reviewIndex > -1) {
-                toReviewIndices.splice(reviewIndex, 1);
-            }
-            if (!validatedIndices.includes(currentQuestionGlobalIndex)) {
-                validatedIndices.push(currentQuestionGlobalIndex);
-            }
-
+            if (reviewIndex > -1) { toReviewIndices.splice(reviewIndex, 1); }
+            if (!validatedIndices.includes(currentQuestionGlobalIndex)) { validatedIndices.push(currentQuestionGlobalIndex); }
             questionsToAsk.shift();
             updateDisplayLists();
-            loadNextQuestion();
+            loadNextQuizQuestion();
         }
 
         function handleIncorrect() {
             if (currentQuestionGlobalIndex === -1) return;
-
             const validatedIndexPos = validatedIndices.indexOf(currentQuestionGlobalIndex);
-            if (validatedIndexPos > -1) {
-                validatedIndices.splice(validatedIndexPos, 1);
-            }
-            if (!toReviewIndices.includes(currentQuestionGlobalIndex)) {
-                toReviewIndices.push(currentQuestionGlobalIndex);
-            }
+            if (validatedIndexPos > -1) { validatedIndices.splice(validatedIndexPos, 1); }
+            if (!toReviewIndices.includes(currentQuestionGlobalIndex)) { toReviewIndices.push(currentQuestionGlobalIndex); }
             updateDisplayLists();
-
             const failedQuestionIndex = questionsToAsk.shift();
             const insertionIndex = Math.min(3, questionsToAsk.length);
             questionsToAsk.splice(insertionIndex, 0, failedQuestionIndex);
-
-            loadNextQuestion();
+            loadNextQuizQuestion();
         }
 
-        // NOUVEAU: Génère les checkboxes pour la sélection de section
-        function populateSectionSelector() {
-            // Extraire les sections uniques et les trier
-            const sections = [...new Set(flashcardsData.map(item => item.section || "Sans Section"))].sort();
-            uniqueSections = sections; // Stocker pour utilisation ultérieure
+        // --- Fonctions Mode Consultation ---
+        function loadConsultationCard(index) {
+            consultationCurrentIndex = index;
+            const success = loadCard(index); // Charge la carte
 
-            if (sectionCheckboxesContainer) {
-                sectionCheckboxesContainer.innerHTML = ''; // Vider le conteneur
-                sections.forEach(section => {
-                    const id = `section-${section.replace(/[^a-zA-Z0-9]/g, '-')}`; // Crée un ID simple
-                    const label = document.createElement('label');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = id;
-                    checkbox.name = 'sections';
-                    checkbox.value = section;
-                    checkbox.checked = true; // Coché par défaut
-
-                    label.htmlFor = id;
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${section}`));
-                    sectionCheckboxesContainer.appendChild(label);
-                });
+            if (success) {
+                updateStatus(); // Met à jour le compteur "Carte X / Y"
+                prevBtn.disabled = (consultationCurrentIndex === 0);
+                nextBtn.disabled = (consultationCurrentIndex === flashcardsData.length - 1);
             } else {
-                console.error("Conteneur de checkboxes de section non trouvé.");
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+            }
+             // Assurer que le bouton Afficher est visible (car loadCard le cache par défaut maintenant)
+             showAnswerConsultBtn.classList.remove('hidden');
+             answerArea.classList.add('hidden'); // Cacher la réponse à chaque navigation
+        }
+
+        function handleShowAnswerConsult() { // Mode Consultation
+             answerArea.classList.remove('hidden');
+             showAnswerConsultBtn.classList.add('hidden'); // Cache après clic
+         }
+
+        function handleConsultationNext() {
+            if (consultationCurrentIndex < flashcardsData.length - 1) {
+                loadConsultationCard(consultationCurrentIndex + 1);
             }
         }
 
-        // NOUVEAU: Gère le démarrage de la session après configuration
-        function startSession() {
+        function handleConsultationPrevious() {
+            if (consultationCurrentIndex > 0) {
+                loadConsultationCard(consultationCurrentIndex - 1);
+            }
+        }
+
+
+        // --- Démarrage des modes ---
+        function startQuiz() {
+            isConsultationMode = false;
+            bodyEl.className = 'mode-quiz'; // Définit le mode
+
             const selectedOrder = document.querySelector('input[name="order"]:checked').value;
             let initialIndices = [];
 
@@ -788,107 +680,140 @@
             } else if (selectedOrder === 'section') {
                 const selectedCheckboxes = document.querySelectorAll('#section-checkboxes input[name="sections"]:checked');
                 const selectedSections = Array.from(selectedCheckboxes).map(cb => cb.value);
-
-                if (selectedSections.length === 0) {
-                    alert("Veuillez sélectionner au moins une section ou choisir un autre mode d'ordre.");
-                    return; // Ne pas démarrer la session
-                }
-
+                if (selectedSections.length === 0) { alert("Veuillez sélectionner au moins une section."); return; }
                 initialIndices = flashcardsData
-                    .map((card, index) => ({ card, index })) // Garder l'index original
+                    .map((card, index) => ({ card, index }))
                     .filter(item => selectedSections.includes(item.card.section || "Sans Section"))
-                    .map(item => item.index); // Récupérer les indices filtrés
-
-                 // Mélanger ou non les questions des sections sélectionnées
-                 if (shuffleSectionsCheckbox && shuffleSectionsCheckbox.checked) {
-                     shuffleArray(initialIndices);
-                 }
-                 // Si non coché, les questions apparaîtront dans l'ordre où elles sont dans flashcardsData,
-                 // mais uniquement celles des sections sélectionnées.
-
-            } else { // 'random' (ou par défaut)
+                    .map(item => item.index);
+                if (shuffleSectionsCheckbox && shuffleSectionsCheckbox.checked) { shuffleArray(initialIndices); }
+            } else { // random
                 initialIndices = flashcardsData.map((_, index) => index);
                 shuffleArray(initialIndices);
             }
 
-             // Vérifier si on a des questions à poser
-             if (initialIndices.length === 0) {
-                 alert("Aucune question trouvée pour la sélection actuelle.");
-                 return;
-             }
+            if (initialIndices.length === 0) { alert("Aucune question trouvée pour la sélection actuelle."); return; }
 
-
-            // Initialiser l'état de la session
-            questionsToAsk = [...initialIndices]; // Copie des indices pour la session
+            questionsToAsk = [...initialIndices];
             originalTotal = questionsToAsk.length;
-            validatedIndices = [];
-            toReviewIndices = [];
-            currentQuestionGlobalIndex = -1;
+            validatedIndices = []; toReviewIndices = []; currentQuestionGlobalIndex = -1;
 
-            // Mettre à jour l'interface
-            setupScreenEl.classList.add('hidden'); // Cacher la config
-            mainContentEl.classList.remove('hidden'); // Afficher le contenu principal
-            completionMessageEl.classList.add('hidden'); // Cacher message fin
-            flashcardContainerEl.classList.remove('hidden'); // S'assurer que la carte est visible
-            trackingListsContainerEl.classList.remove('hidden'); // Afficher les listes
-            showAnswerBtn.disabled = false;
+            setupScreenEl.classList.add('hidden');
+            mainContentEl.classList.remove('hidden');
+            completionMessageEl.classList.add('hidden');
+            flashcardContainerEl.classList.remove('hidden');
+            trackingListsContainerEl.classList.remove('hidden');
+            backToMenuBtn.classList.add('hidden');
 
-            updateDisplayLists(); // Mettre à jour les listes (vides au début)
-            loadNextQuestion(); // Charger la première question
+            // Afficher/Masquer les contrôles
+            showAnswerBtn.classList.remove('hidden');
+            feedbackButtons.classList.add('hidden'); // Sera montré après clic sur showAnswerBtn
+            showAnswerConsultBtn.classList.add('hidden');
+            consultNavButtons.classList.add('hidden');
+
+            updateDisplayLists();
+            loadNextQuizQuestion();
+        }
+
+        function startConsultationMode() {
+            isConsultationMode = true;
+            bodyEl.className = 'mode-consultation'; // Définit le mode
+
+            allCardIndices = flashcardsData.map((_, index) => index);
+            consultationCurrentIndex = 0;
+            currentQuestionGlobalIndex = -1; // Non utilisé pour la logique de nav ici
+
+            setupScreenEl.classList.add('hidden');
+            mainContentEl.classList.remove('hidden');
+            completionMessageEl.classList.add('hidden');
+            flashcardContainerEl.classList.remove('hidden');
+            trackingListsContainerEl.classList.add('hidden'); // Cacher les listes
+            backToMenuBtn.classList.remove('hidden');
+
+            // Afficher/Masquer les contrôles
+            showAnswerBtn.classList.add('hidden');
+            feedbackButtons.classList.add('hidden');
+            showAnswerConsultBtn.classList.remove('hidden');
+            consultNavButtons.classList.remove('hidden');
+
+            loadConsultationCard(consultationCurrentIndex);
         }
 
 
-        // Fonction d'initialisation principale (affiche l'écran de config)
+        // --- Initialisation générale et Configuration ---
+        function populateSectionSelector() {
+            const sections = [...new Set(flashcardsData.map(item => item.section || "Sans Section"))].sort();
+            uniqueSections = sections;
+            if (sectionCheckboxesContainer) {
+                sectionCheckboxesContainer.innerHTML = '';
+                sections.forEach(section => {
+                    const id = `section-${section.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox'; checkbox.id = id; checkbox.name = 'sections';
+                    checkbox.value = section; checkbox.checked = true;
+                    label.htmlFor = id; label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${section}`));
+                    sectionCheckboxesContainer.appendChild(label);
+                });
+            } else { console.error("Conteneur de checkboxes de section non trouvé."); }
+        }
+
+        // Affiche l'écran de configuration
+        function showSetupScreen() {
+            // Cacher le contenu principal, messages, etc.
+            mainContentEl.classList.add('hidden');
+            completionMessageEl.classList.add('hidden');
+            backToMenuBtn.classList.add('hidden');
+
+            // Afficher l'écran de configuration
+            setupScreenEl.classList.remove('hidden');
+
+             // Assurer que le sélecteur de section est dans l'état correct
+             const orderSelected = document.querySelector('input[name="order"]:checked') ? document.querySelector('input[name="order"]:checked').value : 'random';
+             sectionSelectorContainer.classList.toggle('hidden', orderSelected !== 'section');
+        }
+
+        // Initialisation au chargement de la page
         function initializeApp() {
              if (typeof flashcardsData === 'undefined' || !Array.isArray(flashcardsData) || flashcardsData.length === 0) {
                  console.error("ERREUR CRITIQUE: flashcardsData est vide ou non défini.");
                  document.body.innerHTML = '<h1 style="color:red; text-align:center;">Erreur: Impossible de charger les données des flashcards. Vérifiez la section &lt;script&gt; dans le fichier HTML.</h1>';
                  return;
              }
-
-             // Vérifier que les éléments DOM essentiels existent
-             const essentialElements = [setupScreenEl, mainContentEl, flashcardContainerEl, completionMessageEl, questionArea, answerArea, showAnswerBtn, feedbackButtons, restartBtn, remainingCountEl, totalCountEl, validatedListEl, toReviewListEl, trackingListsContainerEl, sectionSelectorContainer, sectionCheckboxesContainer, startSessionBtn];
-             if (essentialElements.some(el => !el)) {
-                 console.error("ERREUR CRITIQUE: Un ou plusieurs éléments HTML essentiels sont manquants. Vérifiez les ID dans la section HTML.");
+            const essentialSetup = [setupScreenEl, mainContentEl, sectionSelectorContainer, sectionCheckboxesContainer, startSessionBtn, startConsultBtn];
+            const essentialQuiz = [flashcardContainerEl, completionMessageEl, questionArea, answerArea, showAnswerBtn, feedbackButtons, restartBtn, remainingCountEl, totalCountEl, validatedListEl, toReviewListEl, trackingListsContainerEl];
+            const essentialConsult = [consultNavButtons, prevBtn, nextBtn, currentCardNumEl, totalCardsConsultEl, showAnswerConsultBtn, backToMenuBtn];
+            if ([...essentialSetup, ...essentialQuiz, ...essentialConsult].some(el => !el)) {
+                 console.error("ERREUR CRITIQUE: Un ou plusieurs éléments HTML essentiels sont manquants. Vérifiez les ID.");
                  alert("Erreur critique: Elements HTML manquants. Vérifiez la console.");
                  return;
-             }
+            }
 
-            // Afficher l'écran de configuration, cacher le reste
-            setupScreenEl.classList.remove('hidden');
-            mainContentEl.classList.add('hidden');
-            completionMessageEl.classList.add('hidden');
-
-
-            // Remplir le sélecteur de sections
             populateSectionSelector();
 
-            // Gérer l'affichage du sélecteur de section basé sur le choix d'ordre
+            // Gérer l'affichage/masquage du sélecteur de sections
             document.querySelectorAll('input[name="order"]').forEach(radio => {
                 radio.addEventListener('change', function() {
-                    if (this.value === 'section') {
-                        sectionSelectorContainer.classList.remove('hidden');
-                    } else {
-                        sectionSelectorContainer.classList.add('hidden');
-                    }
+                    sectionSelectorContainer.classList.toggle('hidden', this.value !== 'section');
                 });
             });
-             // S'assurer que le sélecteur est caché si l'option par défaut n'est pas 'section'
-             if (document.querySelector('input[name="order"]:checked').value !== 'section') {
-                 sectionSelectorContainer.classList.add('hidden');
-             } else {
-                 sectionSelectorContainer.classList.remove('hidden');
-             }
+
+            // Afficher l'écran de configuration initial
+            showSetupScreen();
         }
 
         // --- Écouteurs d'événements ---
-        if (showAnswerBtn) showAnswerBtn.addEventListener('click', handleShowAnswer);
-        if (correctBtn) correctBtn.addEventListener('click', handleCorrect);
-        if (incorrectBtn) incorrectBtn.addEventListener('click', handleIncorrect);
-        if (restartBtn) restartBtn.addEventListener('click', initializeApp); // Recommencer = retour à la config
-        if (startSessionBtn) startSessionBtn.addEventListener('click', startSession); // Bouton pour lancer
+        if (showAnswerBtn) showAnswerBtn.addEventListener('click', handleShowAnswer); // Quiz
+        if (correctBtn) correctBtn.addEventListener('click', handleCorrect); // Quiz
+        if (incorrectBtn) incorrectBtn.addEventListener('click', handleIncorrect); // Quiz
+        if (restartBtn) restartBtn.addEventListener('click', showSetupScreen); // Quiz terminé -> Menu
+        if (startSessionBtn) startSessionBtn.addEventListener('click', startQuiz); // Lancer Quiz
+        if (startConsultBtn) startConsultBtn.addEventListener('click', startConsultationMode); // Lancer Consultation
+        if (prevBtn) prevBtn.addEventListener('click', handleConsultationPrevious); // Consult
+        if (nextBtn) nextBtn.addEventListener('click', handleConsultationNext); // Consult
+        if (showAnswerConsultBtn) showAnswerConsultBtn.addEventListener('click', handleShowAnswerConsult); // Consult
+        if (backToMenuBtn) backToMenuBtn.addEventListener('click', showSetupScreen); // Consult/Quiz terminé -> Menu
 
-        // Démarrer l'application lorsque le DOM est prêt -> affiche l'écran de config
         document.addEventListener('DOMContentLoaded', initializeApp);
         // --- Fin du contenu de script.js ---
     </script>
