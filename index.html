@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards Recouvrement (Réapparition Différée)</title>
+    <style>
+        /* --- Contenu de style.css (inchangé par rapport à la version précédente) --- */
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .main-content {
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #flashcard-container {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 25px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            box-sizing: border-box;
+        }
+
+        #flashcard-container.hidden {
+            display: none;
+        }
+
+        #status-bar {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #555;
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+        }
+
+        #card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 25px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+        }
+
+        #question-area {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 15px;
+            font-size: 1.15em;
+        }
+
+        #answer-area {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            color: #333;
+            text-align: left;
+            font-size: 1em;
+            word-wrap: break-word;
+        }
+
+        #answer-area ul,
+        #answer-area ol {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            padding-left: 20px;
+        }
+        #answer-area li {
+            margin-bottom: 8px;
+        }
+        #answer-area strong {
+            font-weight: bold;
+        }
+        #answer-area em,
+        #answer-area i {
+            font-style: italic;
+            color: #555;
+        }
+        #answer-area strong:first-child {
+             display: block;
+             margin-bottom: 8px;
+             color: #28a745;
+             font-size: 1.05em;
+        }
+        #answer-area code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        #answer-area pre {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        #feedback-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #show-answer-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        #show-answer-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #correct-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        #correct-btn:hover {
+            background-color: #218838;
+        }
+
+        #incorrect-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        #incorrect-btn:hover {
+            background-color: #c82333;
+        }
+
+        #tracking-lists-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .list-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            flex-basis: 45%;
+            flex-grow: 1;
+            box-sizing: border-box;
+            min-width: 250px;
+        }
+
+        .list-section h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #495057;
+            border-bottom: 1px solid #ced4da;
+            padding-bottom: 5px;
+        }
+
+        .list-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .list-section li {
+            font-size: 0.85em;
+            padding: 5px 8px;
+            border-bottom: 1px dotted #e0e0e0;
+            color: #6c757d;
+            word-wrap: break-word;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .list-section li:hover {
+            background-color: #e9ecef;
+        }
+        .list-section li:last-child {
+            border-bottom: none;
+        }
+
+        #validated-list-container h3 { color: #28a745; }
+        #to-review-list-container h3 { color: #dc3545; }
+
+        #completion-message {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            text-align: center;
+            width: 90%;
+            max-width: 650px;
+            box-sizing: border-box;
+        }
+
+        #completion-message.hidden {
+            display: none;
+        }
+
+        #restart-btn {
+             background-color: #ffc107;
+             color: #333;
+             margin-top: 15px;
+             display: inline-block;
+        }
+         #restart-btn:hover {
+            background-color: #e0a800;
+         }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .main-content { width: 95%; }
+            h1 { font-size: 1.5em; margin-bottom: 20px; }
+            #flashcard-container { padding: 15px; margin-bottom: 20px; }
+            #card { padding: 15px; min-height: 150px; }
+            #question-area { font-size: 1.1em; }
+            #answer-area { font-size: 0.95em; }
+            button { padding: 10px 18px; font-size: 0.9em; }
+            #controls { gap: 10px; }
+            #feedback-buttons { gap: 10px; }
+            #tracking-lists-container { flex-direction: column; align-items: center; gap: 15px; }
+            .list-section { flex-basis: 90%; width: 100%; }
+        }
+        /* --- Fin du contenu de style.css --- */
+    </style>
+</head>
+<body>
+
+    <h1>Flashcards Recouvrement Créances Publiques</h1>
+
+    <div class="main-content">
+
+        <!-- Conteneur principal qui sera caché à la fin -->
+        <div id="flashcard-container">
+            <div id="status-bar">
+                Questions restantes : <span id="remaining-count">0</span> | Total initial : <span id="total-count">0</span>
+            </div>
+            <div id="card">
+                <div id="question-area">
+                    Chargement...
+                </div>
+                <div id="answer-area" class="hidden">
+                    <!-- Réponse injectée ici -->
+                </div>
+            </div>
+
+            <div id="controls">
+                <button id="show-answer-btn">Afficher la réponse</button>
+                <div id="feedback-buttons" class="hidden">
+                    <button id="correct-btn">Correct 👍</button>
+                    <button id="incorrect-btn">Incorrect 👎</button>
+                </div>
+            </div>
+        </div> <!-- Fin de flashcard-container -->
+
+        <!-- Nouveau: Conteneur pour les listes de suivi -->
+        <div id="tracking-lists-container">
+            <div id="validated-list-container" class="list-section">
+                <h3>Questions Validées</h3>
+                <ul id="validated-list"></ul>
+            </div>
+            <div id="to-review-list-container" class="list-section">
+                <h3>Questions à Revoir</h3>
+                <ul id="to-review-list"></ul>
+            </div>
+        </div>
+
+        <!-- Message de fin, initialement caché -->
+        <div id="completion-message" class="hidden">
+            🎉 Félicitations ! Vous avez terminé toutes les questions. 🎉
+            <button id="restart-btn">Recommencer</button>
+        </div>
+
+    </div> <!-- Fin de main-content -->
+
+
+    <script>
+        // --- Contenu de data.js ---
+        const flashcardsData = [
+            // --- Chapitre: Principes Généraux ---
+            { q: '<strong>Question 1 :</strong> Qu\'est-ce que le "privilège du préalable" dont bénéficie l\'administration en matière de recouvrement ?', a: '<strong>Réponse :</strong> C\'est la possibilité pour l\'administration de prendre des décisions exécutoires qui s\'imposent aux administrés sans avoir besoin de saisir préalablement un juge. Ces décisions créent unilatéralement des obligations.' },
+            { q: '<strong>Question 2 :</strong> Quelle est la différence entre l\'autorité de la chose décidée et l\'autorité de la chose jugée ?', a: '<strong>Réponse :</strong> L\'autorité de la chose décidée concerne la capacité d\'une décision administrative à s\'imposer et à être exécutée dès son édiction. L\'autorité de la chose jugée concerne l\'irrévocabilité d\'une décision de justice et sa force exécutoire après jugement. La décision administrative n\'a pas la même force que la décision de justice.' },
+            { q: '<strong>Question 3 :</strong> Quelle jurisprudence consacre la faculté d\'émettre une décision exécutoire comme un privilège fondamental de l\'administration ?', a: '<strong>Réponse :</strong> CE, Ass, 2 juillet 1982, <em>Huglo et Lepage-Jessua.</em>' },
+            { q: '<strong>Question 4 :</strong> Si un particulier conteste une décision exécutoire, son recours a-t-il un effet suspensif ?', a: '<strong>Réponse :</strong> Non, en principe, le recours contre une décision exécutoire n\'est pas suspensif. L\'obligation doit être exécutée malgré le recours.' },
+            { q: '<strong>Question 5 :</strong> L\'administration a-t-elle l\'obligation d\'agir par la voie exécutoire pour recouvrer ses créances ? Quelle jurisprudence le précise ?', a: '<strong>Réponse :</strong> Oui, lorsque les conditions sont réunies (notamment pour faire exécuter une obligation), l\'administration a l\'obligation d\'utiliser la voie exécutoire. C\'est confirmé par CE, 30 mai 1913, <em>Préfet de l\'Eure.</em>' },
+            { q: '<strong>Question 6 :</strong> En quoi consiste le "privilège de l\'exécution d\'office" (ou exécution forcée) ?', a: '<strong>Réponse :</strong> C\'est la possibilité pour l\'administration d\'assurer elle-même l\'exécution matérielle de ses décisions exécutoires, en utilisant la contrainte si nécessaire, sans avoir à obtenir une autorisation judiciaire préalable.' },
+            { q: '<strong>Question 7 :</strong> Le recours à l\'exécution d\'office est-il systématique ?', a: '<strong>Réponse :</strong> Non, le recours à l\'exécution d\'office présente un caractère <strong>subsidiaire</strong>. Il n\'est possible que si l\'obéissance des administrés ne peut pas être obtenue autrement.' },
+            { q: '<strong>Question 8 :</strong> Quelles sont les 4 conditions jurisprudentielles (issues de l\'arrêt <em>Société immobilière de Saint-Just</em>) pour que l\'exécution forcée soit possible ?', a: '<strong>Réponse :</strong><ol><li>L\'administration doit se heurter à une résistance ou une mauvaise volonté avérée.</li><li>Il ne doit pas exister de procédé juridique alternatif (sanction pénale, etc.) permettant d\'obtenir le résultat.</li><li>L\'opération administrative doit reposer sur une base légale (texte de loi ou règlement).</li><li>Les mesures d\'exécution forcée doivent être strictement nécessaires et proportionnées au but recherché.</li></ol>' },
+            { q: '<strong>Question 9 :</strong> Quelle jurisprudence est fondatrice concernant les conditions de l\'exécution forcée ?', a: '<strong>Réponse :</strong> TbC, 2 décembre 1902, <em>Société immobilière de Saint-Just.</em>' },
+            { q: '<strong>Question 10 :</strong> Quelle disposition législative confirme la possibilité d\'exécution forcée pour les collectivités territoriales ?', a: '<strong>Réponse :</strong> L\'article <strong>L1617-5 du Code général des collectivités territoriales (CGCT)</strong> dispose qu\'en l\'absence de contestation, le titre de recettes émis permet l\'exécution forcée d\'office contre le débiteur.' },
+            { q: '<strong>Question 11 :</strong> Est-il possible d\'utiliser les voies d\'exécution du droit commun (saisies, etc.) contre une personne publique ? Quelle jurisprudence le précise ?', a: '<strong>Réponse :</strong> Non, il est impossible de recourir aux voies d\'exécution de droit commun contre une personne publique. C\'est le principe d\'insaisissabilité des biens des personnes publiques, affirmé par CE, 16 décembre 1965, <em>Commune d\'Azay-le-rideau.</em>' },
+            { q: '<strong>Question 12 :</strong> Le principe d\'insaisissabilité s\'applique-t-il aux Établissements Publics Industriels et Commerciaux (EPIC) et aux Services Publics Industriels et Commerciaux (SPIC) ? Citez des jurisprudences.', a: '<strong>Réponse :</strong> Non, le principe d\'insaisissabilité n\'est pas applicable aux EPIC et SPIC, qui sont majoritairement soumis au droit privé. Jurisprudences citées : <em>CA Aix en Provence, 11 juillet 1984, SNCF c. Groupement régional des ASSEDIC</em> ; <em>Civ, 1ère, 21 décembre 1987, BRGM c/ Société Lloyd Continental.</em>' },
+            { q: '<strong>Question 13 :</strong> Un débiteur de l\'administration peut-il compenser sa dette avec une créance qu\'il détient sur cette même administration ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, le Conseil d\'État a déduit du principe d\'insaisissabilité qu\'un débiteur ne peut pas opérer une compensation entre sa dette et sa créance sur l\'administration (CE, 8 mars 1961, <em>Société Air-Couzinet Transocéanic).</em>' },
+            { q: '<strong>Question 14 :</strong> Quels sont les principaux textes qui fondent le principe d\'insaisissabilité des biens publics ?', a: '<strong>Réponse :</strong> L\'<strong>Article 537 du Code Civil</strong>, la <strong>Loi du 9 juillet 1991</strong> sur la réforme des procédures civiles d\'exécution (qui exclut les personnes bénéficiant d\'une immunité d\'exécution), et l\'article <strong>L2311-1 du Code général de la propriété des personnes publiques (CG3P)</strong> qui pose explicitement que les biens des personnes publiques mentionnées à l\'article L. 1 sont insaisissables.' },
+            { q: '<strong>Question 15 :</strong> Le principe d\'insaisissabilité s\'applique-t-il uniquement aux biens du domaine public ?', a: '<strong>Réponse :</strong> Non, il s\'applique aussi aux propriétés qui relèvent du <strong>domaine privé</strong> des personnes publiques.' },
+            { q: '<strong>Question 16 :</strong> Quelle est la justification traditionnelle de ce principe d\'insaisissabilité ?', a: '<strong>Réponse :</strong> Les personnes publiques sont réputées comme étant <strong>toujours solvables</strong> par principe.' },
+            { q: '<strong>Question 17 :</strong> Quel texte majeur régit la gestion budgétaire et comptable publique (GBCP) ?', a: '<strong>Réponse :</strong> Le <strong>Décret n° 2012-1246 du 7 novembre 2012</strong> relatif à la gestion budgétaire et comptable publique.' },
+            { q: '<strong>Question 18 :</strong> Quel est l\'objectif principal des règles de la comptabilité publique ?', a: '<strong>Réponse :</strong> La <strong>préservation des fonds publics</strong> (deniers publics).' },
+            { q: '<strong>Question 19 :</strong> Quel est le principe fondamental qui organise les fonctions financières au sein des organismes publics ?', a: '<strong>Réponse :</strong> Le principe de <strong>séparation des fonctions d\'ordonnateur et de comptable public</strong>.' },
+            { q: '<strong>Question 20 :</strong> Quelles sont les missions respectives de l\'ordonnateur et du comptable public ?', a: '<strong>Réponse :</strong> L\'<strong>ordonnateur</strong> décide des dépenses et prescrit l\'exécution des recettes (phase administrative). Le <strong>comptable public</strong> encaisse les recettes, paie les dépenses, assure la garde et la conservation des fonds et valeurs, et contrôle la régularité des opérations (phase comptable).' },
+            { q: '<strong>Question 21 :</strong> Le principe de séparation est-il absolu ? Quelle disposition du GBCP le confirme ?', a: '<strong>Réponse :</strong> Oui, les fonctions sont <strong>incompatibles</strong>. L\'<strong>Article 9 du GBCP</strong> le stipule et précise même l\'incompatibilité pour les conjoints ou partenaires de PACS.' },
+            { q: '<strong>Question 22 :</strong> Distinguez les ordonnateurs principaux des ordonnateurs secondaires. Donnez des exemples.', a: '<strong>Réponse :</strong> Les <strong>ordonnateurs principaux</strong> (ex: ministres, exécutifs locaux) reçoivent directement les autorisations budgétaires. Les <strong>ordonnateurs secondaires</strong> (ex: préfets, chefs de juridiction) agissent sur délégation des ordonnateurs principaux.' },
+            { q: '<strong>Question 23 :</strong> Quelle est la responsabilité principale du comptable public dans le cadre de ses contrôles ? Peut-il refuser d\'exécuter un ordre ?', a: '<strong>Réponse :</strong> Le comptable est tenu, sous sa <strong>responsabilité personnelle et pécuniaire</strong>, de contrôler la régularité financière des ordres de dépense et de recouvrement. Il est <strong>tenu de désobéir aux ordres irréguliers</strong>.' },
+            { q: '<strong>Question 24 :</strong> Que risque une personne non habilitée qui s\'immisce dans les fonctions de comptable public ?', a: '<strong>Réponse :</strong> Elle se verra appliquer le régime de la <strong>gestion de fait</strong>, ce qui peut entraîner une sanction financière et le transfert de la responsabilité des actes accomplis.' },
+            { q: '<strong>Question 25 :</strong> Quelle condition préalable une dépense publique doit-elle remplir ?', a: '<strong>Réponse :</strong> Elle doit avoir été <strong>prévue au budget</strong> de la personne morale de droit public, budget adopté par l\'assemblée délibérante.' },
+            { q: '<strong>Question 26 :</strong> Le budget a-t-il une force obligatoire pour les tiers ?', a: '<strong>Réponse :</strong> Non, le budget n\'a qu\'un caractère de <strong>prévision et d\'autorisation</strong>. Il relève du fonctionnement interne et nul ne peut s\'en prévaloir pour exiger une dépense.' },
+            { q: '<strong>Question 27 :</strong> Quelles sont les phases successives de l\'exécution d\'une dépense publique selon l\'article 29 du GBCP ?', a: '<strong>Réponse :</strong><ol><li>L\'engagement,</li><li>La liquidation,</li><li>L\'ordonnancement (le cas échéant),</li><li>Le paiement.</li></ol>(La phase administrative comprend engagement, liquidation, ordonnancement ; la phase comptable est le paiement).' },
+            { q: '<strong>Question 28 :</strong> Qu\'est-ce que l\'engagement d\'une dépense (Article 30 GBCP) ? Distinguez l\'engagement juridique de l\'engagement comptable.', a: '<strong>Réponse :</strong> L\'<strong>engagement juridique</strong> est l\'acte par lequel l\'organisme public crée ou constate une obligation de laquelle résultera une dépense (ex: signature d\'un contrat). L\'<strong>engagement comptable</strong> est l\'acte de réserver les crédits budgétaires nécessaires pour cette dépense.' },
+            { q: '<strong>Question 29 :</strong> Qu\'est-ce que la liquidation d\'une dépense (Article 31 GBCP) ? Quelles sont ses deux composantes ?', a: '<strong>Réponse :</strong> La liquidation consiste à <strong>vérifier la réalité de la dette</strong> et à <strong>arrêter le montant exact de la dépense</strong>. Ses composantes sont : 1° La <strong>certification du service fait</strong> (attester que la prestation a été réalisée conformément à l\'engagement) ; 2° La <strong>détermination du montant</strong> de la dépense d\'après les titres justifiant les droits du créancier.' },
+            { q: '<strong>Question 30 :</strong> Qu\'est-ce que l\'ordonnancement (ou le mandatement) d\'une dépense (Article 32 GBCP) ?', a: '<strong>Réponse :</strong> C\'est l\'<strong>ordre donné par l\'ordonnateur au comptable public de payer</strong> une dépense préalablement engagée et liquidée.' },
+            { q: '<strong>Question 31 :</strong> Qu\'est-ce que le paiement (Article 33 GBCP) ? Quand peut-il intervenir ?', a: '<strong>Réponse :</strong> C\'est l\'acte par lequel la personne morale <strong>se libère de sa dette</strong>. Il ne peut intervenir, sauf exceptions (avances, acomptes), qu\'<strong>après l\'échéance de la dette et l\'exécution du service</strong>.' },
+            { q: '<strong>Question 32 :</strong> Quels sont les principaux contrôles effectués par le comptable public avant le paiement ?', a: '<strong>Réponse :</strong> Le comptable contrôle la <strong>régularité de la dépense</strong> : qualité de l\'ordonnateur, disponibilité des crédits, imputation budgétaire, validité de la créance (calculs, justificatifs, service fait, caractère libératoire du paiement, absence d\'opposition).' },
+            { q: '<strong>Question 33 :</strong> Que se passe-t-il si le comptable décèle une irrégularité lors de son contrôle ? Quelle procédure peut enclencher l\'ordonnateur ?', a: '<strong>Réponse :</strong> Le comptable doit <strong>suspendre le paiement</strong> et notifier sa décision à l\'ordonnateur. L\'ordonnateur peut alors soit régulariser l\'opération, soit <strong>requérir par écrit le comptable de payer</strong> (procédure de réquisition).' },
+            { q: '<strong>Question 34 :</strong> La réquisition de l\'ordonnateur dégage-t-elle la responsabilité du comptable ? Dans quels cas le comptable <em>doit</em>-il refuser de déférer à un ordre de réquisition (Article 136 GBCP pour l\'Etat) ?', a: '<strong>Réponse :</strong> La réquisition dégage la responsabilité du comptable (qui informe le ministre du budget et la Cour des comptes) SAUF dans certains cas où il doit refuser :<ol><li>Indisponibilité des crédits ;</li><li>Absence de certification du service fait ;</li><li>Caractère non libératoire du règlement ;</li><li>Refus de visa du contrôleur budgétaire (sans autorisation de passer outre).</li></ol>' },
+            { q: '<strong>Question 35 :</strong> En quoi consiste l\'opération de décaissement ?', a: '<strong>Réponse :</strong> C\'est la <strong>remise matérielle des fonds</strong> par le comptable (jouant le rôle de caissier) aux créanciers de l\'administration.' },
+            { q: '<strong>Question 36 :</strong> Quelles sont les missions de l\'ordonnateur dans l\'exécution des recettes (Article 11 GBCP) ?', a: '<strong>Réponse :</strong> L\'ordonnateur <strong>constate les droits</strong> et obligations, <strong>liquide les recettes</strong> (détermine le montant dû) et <strong>émet les ordres de recouvrer</strong>.' },
+            { q: '<strong>Question 37 :</strong> En quoi consiste la liquidation des droits (Article 24 GBCP) ?', a: '<strong>Réponse :</strong> C\'est la détermination du <strong>montant exact de la dette</strong> du redevable envers l\'organisme public. L\'ordre de recouvrer doit indiquer les bases de cette liquidation.' },
+            { q: '<strong>Question 38 :</strong> Quelle est la fonction de l\'ordre de recouvrer (Article 28 GBCP) ?', a: '<strong>Réponse :</strong> L\'ordre de recouvrer (qui sera transmis au comptable) <strong>fonde l\'action en recouvrement</strong>.' },
+            { q: '<strong>Question 39 :</strong> Quelles formes différentes peuvent prendre les ordres de recouvrer selon la nature de la créance ?', a: '<strong>Réponse :</strong><ul><li><strong>Rôle</strong> (impôts directs)</li><li><strong>Avis de mise en recouvrement</strong> (impôts indirects, produits domaniaux si non payés spontanément)</li><li><strong>Contrainte</strong> (droits de douane ?)</li><li><strong>Arrêtés de débets</strong> (marchés publics de l\'Etat, avances non justifiées)</li><li><strong>Titre de perception exécutoire / état exécutoire</strong> (autres créances sans mode particulier).</li></ul>' },
+            { q: '<strong>Question 40 :</strong> Quelle est la mission principale du comptable public dans l\'exécution des recettes (Article 18 GBCP) ?', a: '<strong>Réponse :</strong> Il est <strong>seul chargé</strong> de la <strong>prise en charge</strong> et du <strong>recouvrement</strong> des ordres de recouvrer et des autres créances (contrats, titres de propriété...).' },
+            { q: '<strong>Question 41 :</strong> Quelles sont les deux opérations principales de la phase comptable du recouvrement ?', a: '<strong>Réponse :</strong> 1. Une opération de <strong>contrôle de la régularité</strong> de la recette. 2. Une opération <strong>matérielle de recouvrement</strong>.' },
+            { q: '<strong>Question 42 :</strong> Quels contrôles le comptable effectue-t-il sur la recette (Article 19 GBCP) ?', a: '<strong>Réponse :</strong> Il contrôle la <strong>régularité de l\'autorisation de percevoir</strong> la recette, la mise en recouvrement (dans la limite des éléments dont il dispose), et la régularité des réductions/annulations. Il vérifie notamment que la perception a été autorisée (ex: par la loi de finances) et que la recette a une base juridique réelle.' },
+            { q: '<strong>Question 43 :</strong> En quoi consiste l\'opération matérielle de recouvrement par le comptable ?', a: '<strong>Réponse :</strong> Elle consiste à <strong>notifier les ordres de recouvrer</strong> au débiteur et, si celui-ci ne s\'exécute pas, à engager les procédures de <strong>recouvrement forcé</strong>.' },
+            { q: '<strong>Question 44 :</strong> De quelle nature sont les créances publiques ?', a: '<strong>Réponse :</strong> Ce sont des <strong>droits pécuniaires</strong> au profit des organismes publics, qui constituent leurs recettes.' },
+            { q: '<strong>Question 45 :</strong> Comment peut-on qualifier les créances non-fiscales ?', a: '<strong>Réponse :</strong> Elles sont aussi appelées créances <strong>étrangères à l\'impôt et au domaine</strong>, "autres créances" ou "créances ordinaires des personnes publiques".' },
+            { q: '<strong>Question 46 :</strong> Quels sont les deux types exclusifs de prélèvements obligatoires constituant des créances fiscales ?', a: '<strong>Réponse :</strong> L\'<strong>impôt</strong> et la <strong>taxe</strong>.' },
+            { q: '<strong>Question 47 :</strong> Définissez l\'impôt.', a: '<strong>Réponse :</strong> C\'est un prélèvement <strong>pécuniaire</strong>, de caractère <strong>obligatoire</strong>, effectué en vertu de prérogatives de <strong>puissance publique</strong>, à titre <strong>définitif</strong>, <strong>sans contrepartie déterminée</strong>, en vue d\'assurer le financement des charges publiques.' },
+            { q: '<strong>Question 48 :</strong> Qu\'est-ce qui distingue la taxe de la redevance pour service rendu ?', a: '<strong>Réponse :</strong> La <strong>taxe</strong> a un caractère fiscal car elle est obligatoire, même s\'il peut y avoir un service rendu, il n\'y a <strong>pas d\'équivalence</strong> entre son montant et la valeur du service. La <strong>redevance</strong> est la contrepartie directe et équivalente d\'un service rendu et n\'a pas de caractère fiscal.' },
+            { q: '<strong>Question 49 :</strong> Les cotisations sociales sont-elles des impositions de toute nature (créances fiscales) ? Pourquoi ? Quelle décision du CC le précise ?', a: '<strong>Réponse :</strong> Non. Bien qu\'obligatoires, elles ouvrent droit à des prestations et avantages servis par les régimes sociaux, ce qui leur ôte le caractère fiscal (absence de contrepartie directe pour l\'impôt). <em>CC – 93-325DC du 13 août 1993, Maîtrise de l\'immigration.</em>' },
+            { q: '<strong>Question 50 :</strong> Donnez des exemples de créances non-fiscales résultant directement de la loi.', a: '<strong>Réponse :</strong> Redevances pour service rendu (assainissement, équipement public), hypothèques légales (aide sociale), contribution spéciale OMI (travailleurs étrangers sans autorisation), obligation de rembourser des aides d\'État illégales (si contraire au droit de l\'UE).' },
+            { q: '<strong>Question 51 :</strong> Donnez un exemple de créance non-fiscale résultant d\'un acte administratif unilatéral. Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Le reversement d\'une prime non conforme aux conditions d\'attribution. CE, 8 juillet 1988, <em>Premier ministre c/ société angevine contreplaqué.</em>' },
+            { q: '<strong>Question 52 :</strong> Comment naît une créance non-fiscale résultant d\'une décision de justice ? Comment est-elle gérée comptablement ?', a: '<strong>Réponse :</strong> Elle naît d\'une condamnation d\'un administré à verser une indemnité à l\'administration. Elle correspond à un simple <strong>ordonnancement comptable</strong>.' },
+            { q: '<strong>Question 53 :</strong> Une créance publique peut-elle naître d\'un contrat ?', a: '<strong>Réponse :</strong> Oui, par exemple dans le cadre d\'un contrat passé par une collectivité avec une entreprise.' },
+            { q: '<strong>Question 54 :</strong> Le régime juridique du recouvrement est-il parfaitement homogène pour toutes les créances publiques ?', a: '<strong>Réponse :</strong> Non, il existe des différences importantes, notamment entre créances fiscales et non-fiscales, et selon que la personne publique créancière est l\'État ou une collectivité territoriale.' },
+            { q: '<strong>Question 55 :</strong> Quel principe majeur fait obstacle au recouvrement forcé par un créancier (particulier, entreprise) contre une personne publique ?', a: '<strong>Réponse :</strong> Le principe d\'<strong>insaisissabilité</strong> des deniers publics.' },
+            { q: '<strong>Question 56 :</strong> Existe-t-il des procédures alternatives pour obtenir le paiement d\'une créance sur une personne publique ?', a: '<strong>Réponse :</strong> Oui, il existe des procédures spécifiques de droit public (vues plus loin : mandatement d\'office, inscription d\'office, référé-provision) qui peuvent être aussi efficaces que les voies d\'exécution de droit commun.' },
+            { q: '<strong>Question 57 :</strong> Qui prescrit l\'exécution des recettes et des dépenses selon l\'article 10 du décret de 2012 ?', a: '<strong>Réponse :</strong> Les <strong>ordonnateurs</strong> (principaux ou secondaires).' },
+            { q: '<strong>Question 58 :</strong> Les ordonnateurs peuvent-ils déléguer leur signature ?', a: '<strong>Réponse :</strong> Oui, ils peuvent déléguer leur signature et se faire suppléer.' },
+            { q: '<strong>Question 59 :</strong> Quel est l\'acte typique émis pour le recouvrement de la plupart des créances non-fiscales ?', a: '<strong>Réponse :</strong> Le <strong>titre de perception exécutoire</strong> (ou "état exécutoire").' },
+            { q: '<strong>Question 60 :</strong> Dans quels cas spécifiques un <strong>arrêté de débet</strong> peut-il être émis par les ministres (Article 112 décret 2012) ?', a: '<strong>Réponse :</strong><ol><li>Contre un titulaire de marché public de l\'État.</li><li>Contre une personne tenue de rendre compte de l\'emploi d\'une avance reçue ou de recettes destinées à l\'État (ex: régisseur).</li></ol>' },
+            { q: '<strong>Question 61 :</strong> Une collectivité territoriale peut-elle émettre un arrêté de débet ?', a: '<strong>Réponse :</strong> Non, cette possibilité est réservée à l\'État (ministres).' },
+            { q: '<strong>Question 62 :</strong> Qui sont les ordonnateurs principaux et secondaires de l\'État pour les recettes et dépenses ? (Article 74 et Décret 2004-374)', a: '<strong>Réponse :</strong> Les <strong>ministres</strong> sont les ordonnateurs principaux. Les <strong>préfets</strong> sont les ordonnateurs secondaires des services déconcentrés.' },
+            { q: '<strong>Question 63 :</strong> Les ministres et les préfets peuvent-ils déléguer leur signature pour émettre des titres exécutoires ?', a: '<strong>Réponse :</strong> Oui, cette faculté est prévue par des textes (ex: Décret n°2005-850 pour les ministres, Décret du 29 avril 2004 pour les préfets).' },
+            { q: '<strong>Question 64 :</strong> Qui est compétent pour émettre des titres exécutoires pour les créances des collectivités territoriales ?', a: '<strong>Réponse :</strong> L\'exécutif de la collectivité : le <strong>maire</strong> (commune), le <strong>président du conseil départemental</strong>, le <strong>président du conseil régional</strong>.' },
+            { q: '<strong>Question 65 :</strong> Qui est compétent pour les établissements publics locaux ?', a: '<strong>Réponse :</strong> Les <strong>ordonnateurs</strong> de ces établissements (ex: le président de l\'établissement).' },
+            { q: '<strong>Question 66 :</strong> Qu\'est-ce qu\'une "compétence liée" ?', a: '<strong>Réponse :</strong> C\'est une compétence qu\'une autorité publique <strong>doit obligatoirement exercer</strong> dès lors que les conditions légales ou réglementaires sont remplies. Elle n\'a pas le choix d\'agir ou non.' },
+            { q: '<strong>Question 67 :</strong> L\'ordonnateur a-t-il l\'obligation d\'émettre un titre de perception exécutoire lorsqu\'une créance existe ?', a: '<strong>Réponse :</strong> Oui, il a une <strong>obligation</strong> d\'émettre le titre. C\'est une compétence liée.' },
+            { q: '<strong>Question 68 :</strong> Existe-t-il des exceptions à l\'obligation d\'émettre un ordre de recouvrer ? (Article 114 et Décret 97-775)', a: '<strong>Réponse :</strong> Oui, l\'ordonnateur <strong>peut</strong> ne pas émettre d\'ordre de recouvrer pour les créances dont le montant initial en principal est <strong>inférieur à un minimum fixé par décret</strong> (généralement 50 euros pour l\'État, seuils spécifiques pour les CT - ex: 15 euros hors EP de santé, 5 euros pour EP de santé - Art D1611-1 CGCT).' },
+            { q: '<strong>Question 69 :</strong> L\'ordonnateur a-t-il le choix de la procédure pour recouvrer une créance non-fiscale ?', a: '<strong>Réponse :</strong> Non, il <strong>doit passer par la procédure du titre de perception exécutoire</strong>. Il n\'a pas d\'alternative (sauf cas particulier des créances contractuelles).' },
+            { q: '<strong>Question 70 :</strong> Quelle alternative existe pour une créance d\'origine contractuelle ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> L\'administration peut choisir soit d\'émettre elle-même un titre exécutoire, soit de saisir le juge du contrat. CE 24 avril 1968, <em>Compagnie de Navigation Denis frères.</em>' },
+            { q: '<strong>Question 71 :</strong> Cette alternative s\'applique-t-elle même si la personne publique créancière n\'est pas partie au contrat initial ? (cf. Décision Epinal-Golbey)', a: '<strong>Réponse :</strong> Oui, le CE a admis que si la créance a un fondement contractuel (même indirectement, ex: contrat d\'assurance), la saisine du juge est possible même si la collectivité est tierce au contrat.' },
+            { q: '<strong>Question 72 :</strong> Par qui peut être réalisée l\'évaluation de la matière imposable ?', a: '<strong>Réponse :</strong> Elle peut relever de l\'<strong>administration</strong>, du <strong>contribuable</strong> (via une déclaration) ou d\'un <strong>tiers</strong>.' },
+            { q: '<strong>Question 73 :</strong> Sur quoi repose principalement le système d\'évaluation lorsque c\'est le contribuable qui déclare ?', a: '<strong>Réponse :</strong> Sur une <strong>obligation de déclarer</strong> pesant sur le contribuable, dont la viabilité dépend de la possibilité d\'un <strong>contrôle a posteriori</strong> par l\'administration, pouvant entraîner des <strong>sanctions</strong>.' },
+            { q: '<strong>Question 74 :</strong> Qu\'est-ce qu\'un "rôle" en matière fiscale ? Pour quels impôts est-il utilisé ? (Article 1658 CGI)', a: '<strong>Réponse :</strong> C\'est un <strong>titre de perception collectif</strong> rendu exécutoire par arrêté (directeur des finances publiques ou préfet), listant les contribuables et leur dette fiscale. Il est utilisé pour certains <strong>impôts directs</strong> (impôt sur le revenu, taxe d\'habitation, taxe foncière).' },
+            { q: '<strong>Question 75 :</strong> Comment appelle-t-on le système où l\'administration liquide l\'impôt à partir des informations fournies ?', a: '<strong>Réponse :</strong> Le système des <strong>droits constatés</strong>.' },
+            { q: '<strong>Question 76 :</strong> Pour quels types d\'impôts la liquidation revient-elle directement au redevable ?', a: '<strong>Réponse :</strong> Pour les impôts ne faisant pas l\'objet d\'un rôle, comme l\'<strong>impôt sur les sociétés</strong> ou la <strong>TVA</strong> et autres impôts indirects. Le redevable calcule et paie spontanément.' },
+            { q: '<strong>Question 77 :</strong> Si le contribuable ne paie pas spontanément un impôt liquidé par lui-même, quel acte l\'administration émettra-t-elle ?', a: '<strong>Réponse :</strong> Elle émettra un <strong>avis de mise en recouvrement</strong>.' },
+            { q: '<strong>Question 78 :</strong> Quelles informations essentielles doivent contenir les titres exécutoires et arrêtés de débets ?', a: '<strong>Réponse :</strong> Toutes les informations permettant d\'identifier clairement l\'<strong>objet de la créance</strong> (motivation) et l\'<strong>identité exacte du redevable</strong>.' },
+            { q: '<strong>Question 79 :</strong> Les bases de la liquidation doivent-elles obligatoirement être mentionnées sur le titre ? Qu\'implique l\'article 24 du décret de 2012 ?', a: '<strong>Réponse :</strong> Oui, l\'article 24 du décret de 2012 impose que <strong>toute créance liquidée faisant l\'objet d\'un ordre de recouvrer indique les bases de la liquidation</strong>. Une erreur de liquidation doit donner lieu à un ordre d\'annulation ou de réduction indiquant les bases de la nouvelle liquidation. Une régularisation <em>a posteriori</em> des bases n\'est pas possible si elles étaient absentes initialement (cf. jurisprudence Moine, octobre 1997, mentionnée implicitement).' },
+            { q: '<strong>Question 80 :</strong> Quelle est la force principale d\'un titre de perception exécutoire ?', a: '<strong>Réponse :</strong> Il a <strong>force exécutoire</strong> dès son émission (Loi du 31 décembre 1992).' },
+            { q: '<strong>Question 81 :</strong> Depuis 1992, le titre exécutoire fonde-t-il à la fois le recouvrement amiable et forcé ?', a: '<strong>Réponse :</strong> Oui, il est le fondement unique, que la procédure soit amiable ou contentieuse/forcée (Article 192 GBCP pour les CT, principes similaires pour l\'Etat).' },
+            { q: '<strong>Question 82 :</strong> Le recouvrement amiable est-il une garantie pour le débiteur ?', a: '<strong>Réponse :</strong> Non, c\'est une règle de comptabilité publique, mais l\'administration peut décider de passer directement à l\'exécution forcée.' },
+            { q: '<strong>Question 83 :</strong> Quelle est la différence majeure d\'effet entre un titre de perception exécutoire et un arrêté de débet en cas de contestation par le débiteur ?', a: '<strong>Réponse :</strong> La contestation d\'un <strong>titre de perception exécutoire</strong> entraîne en principe la <strong>suspension automatique de ses effets</strong>. La contestation d\'un <strong>arrêté de débet</strong> n\'est <strong>pas suspensive</strong> ; l\'arrêté est exécutoire par provision.' },
+            { q: '<strong>Question 84 :</strong> Qui assure la notification du titre de perception exécutoire au débiteur ?', a: '<strong>Réponse :</strong> Le <strong>comptable public</strong>.' },
+            { q: '<strong>Question 85 :</strong> Quel mode d\'envoi est préconisé par les textes (ex: LPF L.253, CGCT L1617-5 4°) ? Est-ce suffisant pour garantir l\'exigibilité ?', a: '<strong>Réponse :</strong> L\'envoi sous <strong>pli simple</strong> ou par <strong>voie électronique</strong>. Cependant, le CE semble lier l\'exigibilité de la créance à la <strong>réalité de la notification</strong> (<em>CE 5 mai 1950 Circonstant</em>), ce que le pli simple ne garantit pas. Seul l\'envoi en recommandé ou un acte d\'huissier offre cette garantie.' },
+            { q: '<strong>Question 86 :</strong> Quel est l\'effet principal de la notification ?', a: '<strong>Réponse :</strong> Elle fait <strong>courir les délais de recours</strong> contentieux.' },
+            { q: '<strong>Question 87 :</strong> Une irrégularité dans la notification affecte-t-elle la validité du titre exécutoire lui-même ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, l\'irrégularité de la notification est sans incidence sur la validité de la décision (titre). CE 25 novembre 1960, <em>Société des emballages et bois contreplaqué.</em> Elle empêche juste les délais de recours de courir.' },
+            { q: '<strong>Question 88 :</strong> Le fait qu\'un ordre de recouvrer ne soit pas joint à la lettre de notification affecte-t-il la validité du titre ? (CE 22 mai 1996, Dominique)', a: '<strong>Réponse :</strong> Non, ce n\'est pas une cause de nullité du titre.' },
+            { q: '<strong>Question 89 :</strong> Si un débiteur n\'apprend l\'existence d\'un état exécutoire que par un commandement de payer, quand commencent à courir les délais de recours ? (CE 13 octobre 1978 Edaij)', a: '<strong>Réponse :</strong> Les délais commencent à courir à partir de la <strong>signification du commandement de payer</strong>.' },
+            { q: '<strong>Question 90 :</strong> Qu\'est-ce que la théorie de la connaissance acquise ? Quelle jurisprudence l\'applique aux notifications de titres exécutoires ?', a: '<strong>Réponse :</strong> C\'est une théorie selon laquelle un acte est réputé avoir été notifié si le destinataire a démontré par son comportement (ex: en engageant un recours) qu\'il en a eu connaissance. <em>Ch Com CCass 10 février 1998, Janine Levasseur.</em>' },
+            { q: '<strong>Question 91 :</strong> Quel est le point de départ normal des délais de recours contre un acte administratif ?', a: '<strong>Réponse :</strong> À compter de sa <strong>publication</strong> (actes réglementaires) ou de sa <strong>notification</strong> (actes individuels).' },
+            { q: '<strong>Question 92 :</strong> Qu\'est-ce qu\'un rôle nominatif en matière d\'impôts directs ? Quelles informations contient-il ?', a: '<strong>Réponse :</strong> C\'est une liste nominative des contribuables soumis à l\'impôt, indiquant la base d\'imposition, la nature et le taux des taxes, et le montant des cotisations dues.' },
+            { q: '<strong>Question 93 :</strong> Qu\'est-ce que le "droit de reprise" de l\'administration fiscale ?', a: '<strong>Réponse :</strong> C\'est le droit pour l\'administration de poursuivre le recouvrement d\'un impôt qui n\'a pas été payé dans les délais, ou de rectifier une imposition initiale, dans certaines limites de temps (prescription).' },
+            { q: '<strong>Question 94 :</strong> Comment le contribuable est-il informé de l\'émission d\'un rôle le concernant ?', a: '<strong>Réponse :</strong> Par l\'envoi d\'un <strong>avis d\'imposition</strong>, qui est un extrait du rôle.' },
+            { q: '<strong>Question 95 :</strong> Quelles mentions obligatoires doit contenir l\'avis d\'imposition ?', a: '<strong>Réponse :</strong> Le total des sommes à acquitter, les conditions d\'exigibilité, et la date limite de paiement.' },
+            { q: '<strong>Question 96 :</strong> Quand l\'administration utilise-t-elle un avis de mise en recouvrement (AMR) ?', a: '<strong>Réponse :</strong> Pour authentifier et recouvrer une créance fiscale qui n\'a pas été acquittée spontanément dans les délais (notamment pour les impôts sans rôle, comme la TVA, l\'IS, ou suite à un contrôle fiscal).' },
+            { q: '<strong>Question 97 :</strong> Qui signe et rend exécutoire l\'AMR ?', a: '<strong>Réponse :</strong> Le directeur des services fiscaux (ou autorité compétente).' },
+            { q: '<strong>Question 98 :</strong> Quelles sont les mentions obligatoires d\'un AMR ?', a: '<strong>Réponse :</strong> Identification du débiteur, justification de la créance (base légale, calcul), description des sommes dues (principal, pénalités).' },
+            { q: '<strong>Question 99 :</strong> Quelle est la conséquence d\'une irrégularité de forme de l\'AMR ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> L\'irrégularité (ex: absence de motivation suffisante) entraîne la <strong>décharge de l\'intégralité des droits</strong> réclamés. CE 30 octobre 1989, <em>société de crédit.</em>' },
+            { q: '<strong>Question 100 :</strong> À qui incombe l\'exécution du titre de perception exécutoire ?', a: '<strong>Réponse :</strong> Au <strong>comptable public assignataire</strong> du titre (celui dans les écritures duquel la créance est enregistrée).' },
+            { q: '<strong>Question 101 :</strong> Que se passe-t-il si le comptable obtient l\'admission en non-valeur de la créance ?', a: '<strong>Réponse :</strong> Il est déchargé de son obligation de poursuivre le recouvrement, mais la créance ne disparaît pas pour le débiteur.' },
+            { q: '<strong>Question 102 :</strong> Quels contrôles le comptable doit-il effectuer avant de prendre en charge un titre de perception (cf. Article 19 GBCP) ?', a: '<strong>Réponse :</strong> Il doit vérifier :<ul><li>a) La régularité de l\'autorisation de percevoir la recette ;</li><li>b) La régularité de la mise en recouvrement (existence d\'une base juridique, compétence de l\'ordonnateur, bases de liquidation, etc.) dans la limite des éléments dont il dispose.</li></ul>' },
+            { q: '<strong>Question 103 :</strong> Le comptable doit-il revérifier les bases de la liquidation et la qualité de l\'ordonnateur ?', a: '<strong>Réponse :</strong> Oui, cela fait partie de ses obligations de contrôle avant la prise en charge.' },
+            { q: '<strong>Question 104 :</strong> Quelle est la condition pour que le comptable prenne en charge le titre ? Que doit-il faire en cas d\'irrégularité ?', a: '<strong>Réponse :</strong> La condition est la <strong>régularité comptable</strong> établie lors de ses contrôles. En cas d\'irrégularité, il <strong>doit refuser la prise en charge</strong> par une décision motivée et notifiée à l\'ordonnateur.' },
+            { q: '<strong>Question 105 :</strong> À partir de quel moment la responsabilité personnelle et pécuniaire du comptable peut-elle être engagée en matière de recette ?', a: '<strong>Réponse :</strong> À partir de la <strong>prise en charge</strong> de l\'ordre de recouvrer dans ses écritures.' },
+            { q: '<strong>Question 106 :</strong> L\'ordonnateur peut-il réquisitionner le comptable pour le forcer à prendre en charge un titre jugé irrégulier ?', a: '<strong>Réponse :</strong> Non, contrairement aux dépenses, il n\'y a <strong>pas de procédure de réquisition</strong> pour la prise en charge des recettes. Le comptable ne peut pas être forcé.' },
+            { q: '<strong>Question 107 :</strong> Qui est le comptable compétent pour la prise en charge et qui est compétent pour l\'action en recouvrement ? (Article 116 GBCP)', a: '<strong>Réponse :</strong> Le comptable compétent pour la <strong>prise en charge</strong> est le <strong>comptable assignataire</strong> de la recette (celui désigné pour la recevoir). Le comptable compétent pour la <strong>mise en œuvre de l\'action en recouvrement</strong> (poursuites) est le <strong>comptable public du lieu du domicile du débiteur</strong> au moment de l\'émission du titre (sauf dérogation ministérielle). Le premier transmet au second après ses contrôles.' },
+            { q: '<strong>Question 108 :</strong> Pour les créances non fiscales des collectivités territoriales, qui autorise l\'émission des commandements de payer et les actes de poursuites ? (Article R1617-24 CGCT)', a: '<strong>Réponse :</strong> L\'<strong>ordonnateur</strong> (maire, président...) autorise ces actes, après avoir recueilli l\'avis du comptable. L\'autorisation peut être permanente ou temporaire.' },
+            { q: '<strong>Question 109 :</strong> Que se passe-t-il si l\'ordonnateur refuse d\'autoriser les poursuites ou garde le silence pendant un mois après la demande du comptable ?', a: '<strong>Réponse :</strong> Le refus (explicite ou implicite) permet au comptable de <strong>présenter les créances concernées en non-valeur</strong>.' },
+            { q: '<strong>Question 110 :</strong> Quel est le principal moyen de recouvrement forcé mentionné par l\'article L1617-5 7° CGCT ?', a: '<strong>Réponse :</strong> La <strong>saisie administrative à tiers détenteur (SATD)</strong>, effectuée dans les conditions prévues à l\'article L. 262 du Livre des Procédures Fiscales (LPF).' },
+            { q: '<strong>Question 111 :</strong> Sur quelle idée repose le principe de l\'admission en non-valeur ?', a: '<strong>Réponse :</strong> Sur l\'idée qu\'il n\'est pas possible d\'obliger indéfiniment un comptable à recouvrer une créance qui s\'avère <strong>irrécouvrable</strong>.' },
+            { q: '<strong>Question 112 :</strong> Quelle est la conséquence principale de l\'admission en non-valeur pour le comptable ?', a: '<strong>Réponse :</strong> Elle <strong>retire la créance des prises en charge</strong> du comptable, le dégageant ainsi de l\'obligation d\'en poursuivre le recouvrement (sous réserve de diligences suffisantes).' },
+            { q: '<strong>Question 113 :</strong> L\'admission en non-valeur éteint-elle la dette du débiteur ?', a: '<strong>Réponse :</strong> Non, elle reste <strong>sans effet sur le débiteur</strong>, qui demeure redevable. Le recouvrement doit reprendre si le débiteur redevient solvable.' },
+            { q: '<strong>Question 114 :</strong> Quelle est la nature juridique de l\'admission en non-valeur selon l\'instruction M0 ?', a: '<strong>Réponse :</strong> C\'est une « <strong>simple mesure d\'ordre budgétaire et comptable</strong> », visant à faire disparaître comptablement les créances irrécouvrables.' },
+            { q: '<strong>Question 115 :</strong> Pour obtenir l\'admission en non-valeur, que doit prouver le comptable ?', a: '<strong>Réponse :</strong> Il doit prouver l\'<strong>irrécouvrabilité</strong> de la créance et justifier des <strong>diligences</strong> qu\'il a accomplies dans les délais impartis pour tenter de la recouvrer.' },
+            { q: '<strong>Question 116 :</strong> Qui est compétent pour décider de l\'admission en non-valeur des créances d\'une collectivité territoriale ?', a: '<strong>Réponse :</strong> L\'<strong>assemblée délibérante</strong> de la collectivité (conseil municipal, départemental, régional).' },
+            { q: '<strong>Question 117 :</strong> La décision d\'admission en non-valeur est-elle susceptible de recours par le comptable ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, elle est considérée comme un « acte d\'administration » ou une mesure d\'ordre intérieur, insusceptible de recours. CE, 13 mai 1921, <em>Longon.</em>' },
+            { q: '<strong>Question 118 :</strong> La décision d\'admission en non-valeur lie-t-elle le juge des comptes ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, elle n\'emporte pas décharge de responsabilité du comptable et ne lie pas le juge des comptes, qui peut mettre en débet un comptable si les diligences ont été insuffisantes. <em>Cour des comptes, 16 décembre 1985, Ramounet c/ TPG de la Corrèze</em> ; <em>CE, Ass., 23 juin 1989, Ministre des finances c/ Vèque.</em>' },
+            { q: '<strong>Question 119 :</strong> Qui est competent pour admettre en non-valeur les créances non-fiscales de l\'État (Décret 92-1370) ?', a: '<strong>Réponse :</strong> L\'<strong>ordonnateur ayant émis l\'ordre de recouvrer</strong> (préfet, ambassadeur, ou autorités déléguées). La compétence n\'appartient pas au Parlement.' },
+            { q: '<strong>Question 120 :</strong> Quelle est la procédure pour l\'admission en non-valeur des créances de l\'État ?', a: '<strong>Réponse :</strong><ol><li><strong>Demande du comptable</strong> à l\'autorité compétente, avec un état récapitulatif justifiant l\'irrécouvrabilité (identité débiteur, montant, motif).</li><li><strong>Accusé de réception</strong> par l\'autorité.</li><li><strong>Décision</strong> de l\'autorité (admission ou refus motivé).</li><li><strong>Notification</strong> de la décision au comptable (et au ministre du budget en cas de refus).</li></ol>' },
+            { q: '<strong>Question 121 :</strong> L\'administration fiscale a-t-elle l\'obligation de poursuivre le recouvrement des impositions exigibles ?', a: '<strong>Réponse :</strong> Oui, l\'administration est obligée de poursuivre le recouvrement lorsque l\'exigibilité est certaine.' },
+            { q: '<strong>Question 122 :</strong> Quelle formalité préalable est généralement requise avant d\'engager des poursuites pour une créance fiscale, selon l\'article L257-0 A LPF ? Dans quels cas n\'est-elle pas nécessaire ?', a: '<strong>Réponse :</strong> Une <strong>lettre de relance</strong> doit précéder la mise en demeure de payer, sauf si une autre défaillance a été constatée pour la même catégorie d\'impôt dans les 3 années précédentes. <br>Elle n\'est <strong>pas applicable</strong> non plus : aux impositions issues d\'une procédure de rectification ou d\'imposition d\'office, aux créances > 15 000 €, aux créances nées après une procédure collective, aux créances de certaines grandes entreprises, etc.' },
+            { q: '<strong>Question 123 :</strong> Si la lettre de relance reste sans effet après 30 jours, quelle est l\'étape suivante ? (L257-0 A LPF)', a: '<strong>Réponse :</strong> Le comptable public peut notifier une <strong>mise en demeure de payer</strong>.' },
+            { q: '<strong>Question 124 :</strong> Si la mise en demeure de payer reste sans effet après 30 jours (ou 8 jours dans certains cas), que peut faire le comptable ? (L257-0 A LPF)', a: '<strong>Réponse :</strong> Il peut engager les <strong>poursuites</strong> (premier acte de poursuite).' },
+            { q: '<strong>Question 125 :</strong> Quel est généralement le premier acte de poursuite en matière fiscale ? Quel délai doit-il respecter ?', a: '<strong>Réponse :</strong> Le <strong>commandement de payer</strong>, qui somme le débiteur de payer sous peine de contrainte (saisie). Il intervient généralement 30 jours après la mise en demeure. La saisie peut avoir lieu 3 jours après le commandement.' },
+            { q: '<strong>Question 126 :</strong> Quel autre moyen de poursuite spécifique l\'administration fiscale peut-elle utiliser ? (L262 LPF)', a: '<strong>Réponse :</strong> L\'<strong>avis à tiers détenteur (ATD)</strong>, désormais intégré dans la Saisie Administrative à Tiers Détenteur (SATD), qui permet de saisir directement les sommes dues au contribuable par un tiers (banque, employeur...).' },
+            { q: '<strong>Question 127 :</strong> L\'ATD/SATD peut-il être utilisé si le contribuable a obtenu un sursis de paiement avec garanties ?', a: '<strong>Réponse :</strong> Non, si le sursis a été accordé et les garanties jugées suffisantes.' },
+            { q: '<strong>Question 128 :</strong> Quand l\'ATD/SATD devient-il définitif et quels sont les droits du redevable ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Il ne devient définitif qu\'après un délai de <strong>2 mois</strong> pendant lequel le redevable peut former <strong>opposition</strong> aux poursuites. <em>Cass, Com, 22 novembre 1983.</em>' },
+            { q: '<strong>Question 129 :</strong> Que risque le tiers détenteur (banque, employeur) qui n\'exécute pas l\'ATD/SATD ?', a: '<strong>Réponse :</strong> Il devient <strong>solidairement débiteur</strong> des impôts dus par le redevable et peut être poursuivi sur ses propres biens.' },
+            { q: '<strong>Question 130 :</strong> Quelle garantie principale le Trésor public possède-t-il sur les biens meubles du débiteur ?', a: '<strong>Réponse :</strong> Un <strong>privilège général mobilier</strong> qui prime la plupart des autres privilèges (sauf superprivilège des salaires, frais de justice, etc.). Il existe différents rangs selon les impôts.' },
+            { q: '<strong>Question 131 :</strong> Quelle garantie le Trésor possède-t-il sur les biens immeubles du débiteur ? S\'applique-t-elle aux tiers ?', a: '<strong>Réponse :</strong> Une <strong>hypothèque légale</strong> sur tous les immeubles du redevable. Elle s\'applique aussi aux immeubles des tiers tenus solidairement ou responsables (ex: sur un immeuble commun pour une dette fiscale d\'un époux).' },
+            { q: '<strong>Question 132 :</strong> Le recouvrement de l\'impôt peut-il mettre en cause des tiers solidairement responsables ? Donnez des exemples légaux.', a: '<strong>Réponse :</strong> Oui. Exemples : <strong>Solidarité entre époux</strong> (Art 1685 CGI) ; <strong>Solidarité des cessionnaires de fonds de commerce</strong> (Art 1684-1 CGI).' },
+            { q: '<strong>Question 133 :</strong> Dans quel cas un dirigeant de société peut-il être déclaré solidairement responsable des dettes fiscales de la société ? (Article L267 LPF)', a: '<strong>Réponse :</strong> Lorsque, par ses <strong>manœuvres frauduleuses</strong> ou l\'<strong>inobservation grave et répétée des obligations fiscales</strong>, il a rendu impossible le recouvrement des impôts et pénalités dus par la société. La décision est prise par le président du tribunal judiciaire saisi par le comptable public.' },
+            { q: '<strong>Question 134 :</strong> Qu\'est-ce qu\'une remise gracieuse ?', a: '<strong>Réponse :</strong> C\'est une <strong>libéralité</strong> accordée par l\'administration à un débiteur, consistant en une réduction totale ou partielle de sa dette (principal, pénalités, intérêts), généralement pour des motifs liés à sa situation financière difficile (gêne, précarité). Elle doit être demandée par le débiteur.' },
+            { q: '<strong>Question 135 :</strong> Qui est compétent pour accorder une remise gracieuse pour une créance étatique non-fiscale ? (Article 120 décret 2012)', a: '<strong>Réponse :</strong> Le <strong>ministre chargé du budget</strong> ou, par délégation, le <strong>comptable public</strong> chargé du recouvrement (dans certaines limites de montant). Au-delà d\'un certain seuil, l\'avis (simple) du Conseil d\'État peut être requis.' },
+            { q: '<strong>Question 136 :</strong> Qui est compétent pour une créance d\'une collectivité territoriale ?', a: '<strong>Réponse :</strong> L\'<strong>assemblée délibérante</strong> de la collectivité (ou de l\'établissement public local), en raison de sa compétence budgétaire (L1612 CGCT).' },
+            { q: '<strong>Question 137 :</strong> Quelle est la procédure pour une demande de remise gracieuse d\'une créance de l\'État ?', a: '<strong>Réponse :</strong><ol><li>Demande instruite par le comptable public (enquête de solvabilité, avis éventuel de l\'ordonnateur).</li><li>Décision de l\'autorité compétente (comptable ou ministre, avec avis éventuel du CE).</li><li>Notification de la décision au débiteur par le comptable.</li></ol>' },
+            { q: '<strong>Question 138 :</strong> La décision de remise gracieuse doit-elle être motivée ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, les décisions accordant ou refusant une remise gracieuse n\'ont pas à être motivées car elles ne relèvent pas du champ de la loi du 11 juillet 1979. CE, 30 mars 1987, <em>Benabou.</em>' },
+            { q: '<strong>Question 139 :</strong> L\'administration a-t-elle l\'obligation d\'accorder une remise gracieuse ? Quel type de pouvoir exerce-t-elle ?', a: '<strong>Réponse :</strong> Non, l\'octroi d\'une remise est une <strong>simple faculté</strong>. L\'administration exerce un <strong>pouvoir discrétionnaire</strong>.' },
+            { q: '<strong>Question 140 :</strong> Le refus de remise gracieuse est-il susceptible de recours contentieux ? Sous quelles conditions ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Oui, mais le contrôle du juge administratif est <strong>restreint</strong> : il ne censure qu\'en cas d\'erreur de fait, de droit, ou d\'appréciation manifestement erronée des circonstances. CE 16 décembre 1988, <em>Roux.</em>' },
+            { q: '<strong>Question 141 :</strong> Quelle est la règle générale pour les remises gracieuses en matière fiscale (impôts et pénalités) ? (Article L247 LPF)', a: '<strong>Réponse :</strong> Elles sont possibles si le contribuable est dans l\'impossibilité de payer par suite de gêne ou d\'indigence. La demande doit être faite après que l\'imposition soit définitive (délais de réclamation expirés).' },
+            { q: '<strong>Question 142 :</strong> Existe-t-il des impôts pour lesquels aucune remise (totale ou partielle) n\'est possible sur les droits en principal ?', a: '<strong>Réponse :</strong> Oui, l\'article L247 LPF interdit les remises sur les droits d\'enregistrement, l\'IFI, la taxe de publicité foncière, les droits de timbre, la taxe sur le CA (sauf cas très spécifique), les contributions indirectes. La remise ne peut porter que sur les pénalités pour ces impôts.' },
+            { q: '<strong>Question 143 :</strong> Dans quel cadre particulier l\'État peut-il accorder des remises de dettes fiscales (principal et pénalités) à des entreprises en difficulté ? (L626-6 C.Com)', a: '<strong>Réponse :</strong> Dans le cadre d\'une procédure de <strong>conciliation, sauvegarde ou redressement judiciaire</strong>, via la Commission des chefs de services financiers (CCSF), sous conditions (similaires à celles d\'un créancier privé, respect droit UE des aides d\'État).' },
+            { q: '<strong>Question 144 :</strong> L\'administration dispose-t-elle d\'une marge de manœuvre dans l\'octroi des remises fiscales ? Comment assure-t-elle une certaine uniformité ?', a: '<strong>Réponse :</strong> Oui, elle a une marge de manœuvre importante (équité). Elle utilise des <strong>lignes directrices</strong> (doctrine fiscale) pour assurer une uniformité de traitement, en prenant en compte la situation personnelle, le comportement fiscal, les antécédents du contribuable, etc.' },
+            { q: '<strong>Question 145 :</strong> Qu\'est-ce qu\'une transaction au sens de l\'article 2044 du Code Civil ? Quelle différence avec la remise gracieuse ?', a: '<strong>Réponse :</strong> C\'est un <strong>contrat</strong> par lequel les parties, par des <strong>concessions réciproques</strong>, terminent une contestation née ou préviennent une contestation à naître. Contrairement à la remise (unilatérale), la transaction est <strong>bilatérale</strong> et exige des concessions de chaque partie.' },
+            { q: '<strong>Question 146 :</strong> Qui est compétent pour transiger sur les créances non-fiscales de l\'État ? (Article 121 décret 2012)', a: '<strong>Réponse :</strong> Le <strong>comptable chargé du recouvrement</strong> (si créance < 76 000 €) ou l\'<strong>agent judiciaire de l\'État</strong> (au-delà).' },
+            { q: '<strong>Question 147 :</strong> Qui est compétent pour les collectivités territoriales ? (Ex: L3213-5 CGCT pour le département)', a: '<strong>Réponse :</strong> L\'<strong>assemblée délibérante</strong> (conseil départemental statue sur les transactions).' },
+            { q: '<strong>Question 148 :</strong> La transaction est-elle possible en matière fiscale sur le principal de l\'impôt ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, la perception de l\'impôt intéresse l\'ordre public et ne peut faire l\'objet d\'un contrat. Cass, 13 mars 1895, <em>Dreyfus frères.</em> Un accord contraire serait nul de plein droit.' },
+            { q: '<strong>Question 149 :</strong> La transaction est-elle possible sur les pénalités fiscales ? (L247 LPF)', a: '<strong>Réponse :</strong> Oui, l\'article L247 du LPF permet à l\'administration de transiger sur les <strong>pénalités, amendes ou majorations fiscales</strong> lorsque l\'imposition est éventuellement litigieuse. Le contribuable renonce au contentieux en échange d\'une atténuation des pénalités.' },
+            { q: '<strong>Question 150 :</strong> Quelles sont les conséquences d\'une transaction ?', a: '<strong>Réponse :</strong> Elle a l\'<strong>autorité de la chose jugée en dernier ressort</strong> (Art 2052 Cc). Elle éteint définitivement le litige et les droits concernés. L\'administration ne peut plus réclamer les pénalités remises, et le contribuable doit respecter ses engagements.' },
+            { q: '<strong>Question 151 :</strong> Quel est le délai de prescription de droit commun du droit de reprise de l\'administration fiscale ? (L186 LPF)', a: '<strong>Réponse :</strong> Il s\'exerce jusqu\'à l\'expiration de la <strong>sixième année</strong> suivant celle du fait générateur de l\'impôt.' },
+            { q: '<strong>Question 152 :</strong> Ce délai de 6 ans est-il souvent appliqué ? Donnez des exemples de délais plus courts ou plus longs.', a: '<strong>Réponse :</strong> Non, il est rarement appliqué car de nombreux délais spécifiques existent : <strong>3 ans</strong> (IR, IS, TVA, CET), <strong>2 ans</strong> (centres de gestion agréés), <strong>1 an</strong> (taxes foncière/habitation, contributions indirectes), <strong>10 ans</strong> (activité occulte, avoirs à l\'étranger non déclarés).' },
+            { q: '<strong>Question 153 :</strong> Quel est le délai de prescription pour une créance non-fiscale de droit commun ? S\'applique-t-il à l\'État ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Le délai de prescription de droit commun est de <strong>5 ans</strong> (depuis la loi de 2008). Ce délai s\'applique aux créances non-fiscales de l\'État (le délai abrégé L169 LPF de 3 ans n\'est pas applicable). CE, 13 mai 1960, <em>Secrétaire d\'État à l\'agriculture c/ Manière.</em>' },
+            { q: '<strong>Question 154 :</strong> Quel est le délai de prescription de l\'action en recouvrement pour les créances fiscales dont la perception incombe aux comptables publics ? (L274 LPF)', a: '<strong>Réponse :</strong> <strong>Quatre ans</strong> à compter du jour de la mise en recouvrement du rôle ou de l\'envoi du titre exécutoire (AMR...). Ce délai peut être augmenté de deux ans si le redevable est dans un État hors UE sans assistance mutuelle.' },
+            { q: '<strong>Question 155 :</strong> Quelle est la conséquence de cette prescription pour le comptable public ?', a: '<strong>Réponse :</strong> Le comptable ne peut plus agir. S\'il n\'a pas fait les diligences nécessaires, sa responsabilité personnelle et pécuniaire peut être engagée (il devra reverser le montant sur ses deniers propres).' },
+            { q: '<strong>Question 156 :</strong> Quel est le délai de prescription de l\'action en recouvrement pour les créances non-fiscales de l\'État ? Quelles jurisprudences ?', a: '<strong>Réponse :</strong> Le CE a jugé que les titres de perception exécutoires pour créances non-fiscales sont soumis à la <strong>prescription de droit commun</strong> (historiquement 30 ans, puis ramenée progressivement, aujourd\'hui 5 ans implicitement, même si le texte n\'est pas explicite sur ce point après la réforme). <em>CE, 30 mars 1990, Leca</em> ; <em>CE, 13 décembre 1935, Ministre des colonies c/ Compagnie des messageries maritimes fluviales Cochinchine.</em> Note: La pratique actuelle tend à aligner sur les 4 ans du LPF par assimilation, mais le fondement textuel reste débattu.' },
+            { q: '<strong>Question 157 :</strong> Quel est le délai de prescription de l\'action en recouvrement pour les créances (fiscales et non-fiscales) des collectivités locales ? (L1617-5 3° CGCT)', a: '<strong>Réponse :</strong> <strong>Quatre ans</strong> à compter de la <strong>prise en charge du titre de recettes</strong> par le comptable.' },
+            { q: '<strong>Question 158 :</strong> En matière de créance fiscale, le contribuable doit-il obligatoirement former un recours administratif avant de saisir le juge ?', a: '<strong>Réponse :</strong> Oui, la <strong>réclamation préalable</strong> auprès de l\'administration fiscale est <strong>obligatoire</strong> avant toute saisine du tribunal (administratif ou judiciaire selon l\'impôt).' },
+            { q: '<strong>Question 159 :</strong> Quelle est la différence entre un recours gracieux et un recours hiérarchique ?', a: '<strong>Réponse :</strong> Le <strong>recours gracieux</strong> est adressé à l\'auteur de l\'acte contesté. Le <strong>recours hiérarchique</strong> est adressé au supérieur hiérarchique de l\'auteur de l\'acte.' },
+            { q: '<strong>Question 160 :</strong> La réclamation préalable fiscale se distingue-t-elle de la demande de remise gracieuse ?', a: '<strong>Réponse :</strong> Oui. La <strong>réclamation</strong> conteste le <strong>bien-fondé</strong> ou la régularité de l\'imposition (terrain du droit). La <strong>remise gracieuse</strong> sollicite une mesure de bienveillance basée sur l\'opportunité et la situation du débiteur.' },
+            { q: '<strong>Question 161 :</strong> En matière de créances non-fiscales des collectivités territoriales, une réclamation préalable est-elle obligatoire pour contester le bien-fondé de la créance ? Pour contester un acte de poursuite ? (L1617-5 CGCT)', a: '<strong>Réponse :</strong><ul><li>Pour contester le <strong>bien-fondé</strong> de la créance : <strong>Non</strong>, l\'action directe devant le juge compétent est possible dans les 2 mois de la réception du titre ou du premier acte de poursuite.</li><li>Pour contester la <strong>régularité d\'un acte de poursuite</strong> : <strong>Oui</strong>, la réclamation préalable est obligatoire selon les modalités de l\'article L. 281 LPF.</li></ul>' },
+            { q: '<strong>Question 162 :</strong> En matière de créances non-fiscales de l\'État, une réclamation préalable est-elle obligatoire avant de saisir le juge ? (Article 118 décret 2012)', a: '<strong>Réponse :</strong> Oui, <strong>avant de saisir la juridiction compétente</strong>, le redevable doit adresser une <strong>réclamation préalable</strong> au comptable chargé du recouvrement.' },
+            { q: '<strong>Question 163 :</strong> Dans quels délais cette réclamation doit-elle être déposée (sous peine de nullité) ? (Article 118 décret 2012)', a: '<strong>Réponse :</strong><ul><li>En cas d\'<strong>opposition à l\'exécution</strong> d\'un titre de perception (contestation de l\'existence, montant, exigibilité) : dans les <strong>deux mois</strong> suivant la notification du titre ou du premier acte de poursuite.</li><li>En cas d\'<strong>opposition à poursuites</strong> (contestation de la régularité formelle d\'un acte de poursuite) : dans les <strong>deux mois</strong> suivant la notification de cet acte.</li></ul>' },
+            { q: '<strong>Question 164 :</strong> Quel est l\'effet de l\'introduction d\'une demande en justice contre un titre exécutoire non-fiscal ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Les titres <strong>cessent d\'être exécutoires</strong> dès l\'introduction de la demande tendant à leur annulation (ou à la décharge de l\'obligation). CE, 19 juin 1985, <em>Commune des Angles c/ Scté Areny frères.</em> L\'opposition fait disparaître le titre, le débat porte sur la créance elle-même.' },
+            { q: '<strong>Question 165 :</strong> Le recours contre un titre de perception exécutoire devant le juge administratif est-il suspensif ?', a: '<strong>Réponse :</strong> Oui, en principe, l\'opposition à l\'exécution (contestation de la créance) a un <strong>effet suspensif</strong> en première instance, basé sur la jurisprudence du CE (confirmé implicitement par Art 117 décret 2012 pour certains titres émis sous L.252A LPF).' },
+            { q: '<strong>Question 166 :</strong> Le recours en appel devant la Cour Administrative d\'Appel a-t-il un effet suspensif ? Qu\'en est-il du pourvoi en cassation ? (CE, 5 mai 1995, SARL Fromarsac)', a: '<strong>Réponse :</strong> L\'appel devant la CAA <strong>n\'est pas suspensif</strong> (contrairement à l\'appel judiciaire). Le pourvoi en cassation devant le CE n\'est <strong>pas non plus suspensif</strong>.' },
+            { q: '<strong>Question 167 :</strong> À qui incombe la charge de prouver l\'existence et le bien-fondé de la créance non-fiscale devant le juge, même si c\'est le débiteur qui a formé l\'opposition ?', a: '<strong>Réponse :</strong> C\'est à l\'<strong>administration créancière</strong> (qui devient demanderesse à l\'action) de prouver que sa créance existe et est bien fondée. Il y a un <strong>renversement de la charge de la preuve</strong>.' },
+            { q: '<strong>Question 168 :</strong> Quels sont les deux types d\'opposition que peut former le débiteur d\'une créance non-fiscale ?', a: '<strong>Réponse :</strong><ol><li>L\'<strong>opposition à exécution</strong> (conteste le bien-fondé de la créance).</li><li>L\'<strong>opposition à poursuites</strong> (conteste la régularité formelle des actes de poursuite).</li></ol>' },
+            { q: '<strong>Question 169 :</strong> Quel juge est compétent pour statuer sur une opposition à poursuites (actes de droit commun type saisie, commandement...) ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Le <strong>juge judiciaire</strong>, car il s\'agit d\'incidents relevant des voies d\'exécution de droit commun. <em>CE, 17 décembre 1962, Demoiselle Fleury</em> ; <em>CE, 6 mars 1946, Lardeau.</em>' },
+            { q: '<strong>Question 170 :</strong> Quel juge est compétent pour statuer sur une opposition à exécution ?', a: '<strong>Réponse :</strong> La compétence dépend de la <strong>nature de la créance</strong> sous-jacente : <strong>juge administratif</strong> si la créance trouve son origine dans un rapport de droit public ; <strong>juge judiciaire</strong> si elle trouve son origine dans un rapport de droit privé.' },
+            { q: '<strong>Question 171 :</strong> L\'opposition à exécution est-elle un recours en annulation contre le titre ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, le titre n\'est qu\'un procédé de recouvrement et ne détermine pas la compétence. L\'opposition porte sur la dette elle-même. Le titre "ne saurait être détaché de la dette elle-même". <em>CE, Ducerf.</em>' },
+            { q: '<strong>Question 172 :</strong> Le recours contre un arrêté de débet est-il suspensif ?', a: '<strong>Réponse :</strong> Non, le silence du décret de 2012 et les principes généraux indiquent un caractère <strong>non-suspensif</strong>. Les arrêtés sont exécutoires par provision.' },
+            { q: '<strong>Question 173 :</strong> Quel type de contentieux est celui des arrêtés de débets ? Le ministère d\'avocat est-il obligatoire ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> C\'est un contentieux de <strong>pleine juridiction</strong> (plein contentieux). Le ministère d\'avocat est donc en principe <strong>obligatoire</strong>. CE, 28 novembre 1902, <em>D\'Aubigny.</em>' },
+            { q: '<strong>Question 174 :</strong> Dans quels cas un arrêté de débet peut-il être émis ? Quelle est la nature du contrat pour un titulaire de marché public avec l\'État ?', a: '<strong>Réponse :</strong> Contre un titulaire de marché public de l\'État ou un régisseur. Le marché public conclu avec l\'État est <strong>législativement qualifié de contrat administratif</strong> (article 2 loi du 11 décembre 2001).' },
+            { q: '<strong>Question 175 :</strong> Le requérant peut-il demander la suspension des effets d\'un arrêté de débet ? Sur quel fondement ? Quelles conditions ?', a: '<strong>Réponse :</strong> Oui, par la voie du <strong>référé-suspension</strong> (Article L521-1 du Code de Justice Administrative - CJA). Conditions : 1. <strong>Urgence</strong> à suspendre. 2. Existence d\'un <strong>doute sérieux</strong> sur la légalité de l\'arrêté.' },
+            { q: '<strong>Question 176 :</strong> La réclamation administrative préalable est-elle obligatoire avant de contester un arrêté de débet en justice ?', a: '<strong>Réponse :</strong> Non, en l\'absence de texte l\'imposant, la saisine directe du juge est possible.' },
+            { q: '<strong>Question 177 :</strong> Sur quoi porte principalement le contentieux fiscal ?', a: '<strong>Réponse :</strong> Soit sur l\'<strong>assiette</strong> de l\'impôt (bien-fondé, calcul - L190 LPF), soit sur le <strong>recouvrement</strong> (régularité des actes de poursuite - L281 LPF).' },
+            { q: '<strong>Question 178 :</strong> Quel(s) ordre(s) de juridiction est (sont) compétent(s) pour le contentieux de l\'impôt ? (L199 LPF)', a: '<strong>Réponse :</strong> Les deux ordres :<ul><li><strong>Tribunal administratif</strong> pour les impôts directs (IR, IS, taxes foncières...) et les taxes sur le chiffre d\'affaires (TVA) et assimilées.</li><li><strong>Tribunal judiciaire</strong> pour les droits d\'enregistrement, IFI, taxe de publicité foncière, droits de timbre, contributions indirectes.</li></ul>' },
+            { q: '<strong>Question 179 :</strong> Y a-t-il une différence significative de procédure ou de jurisprudence entre les deux ordres ?', a: '<strong>Réponse :</strong> Non, les règles sont très similaires et les jurisprudences largement harmonisées.' },
+            { q: '<strong>Question 180 :</strong> La réclamation préalable est-elle obligatoire en contentieux de l\'assiette fiscale ? (R190-1 LPF)', a: '<strong>Réponse :</strong> Oui, elle est <strong>strictement obligatoire</strong> avant toute saisine du juge compétent.' },
+            { q: '<strong>Question 181 :</strong> Quelles sont les mentions obligatoires d\'une réclamation fiscale sous peine d\'irrecevabilité ? (R197-3 LPF)', a: '<strong>Réponse :</strong> Identification de l\'imposition contestée, exposé sommaire des moyens, conclusions, signature manuscrite, pièces justificatives (avis d\'imposition, AMR, etc.).' },
+            { q: '<strong>Question 182 :</strong> La réclamation fiscale ou le recours devant le juge ont-ils un effet suspensif sur l\'obligation de payer l\'impôt ?', a: '<strong>Réponse :</strong> Non, le recours n\'est <strong>pas suspensif</strong>.' },
+            { q: '<strong>Question 183 :</strong> Quelle faculté le contribuable peut-il exercer pour différer le paiement de la partie contestée de l\'impôt ? (L277 LPF)', a: '<strong>Réponse :</strong> Il peut demander le <strong>sursis de paiement</strong> dans sa réclamation préalable.' },
+            { q: '<strong>Question 184 :</strong> Le sursis de paiement est-il automatique ? Quelles conditions peuvent être exigées ?', a: '<strong>Réponse :</strong> Il est de droit si la demande est formulée. Toutefois, si le montant contesté dépasse un certain seuil (4500 euros - R277-7 LPF), le débiteur doit constituer des <strong>garanties</strong> (caution, hypothèque...).' },
+            { q: '<strong>Question 185 :</strong> Que peut faire le comptable si les garanties sont insuffisantes ou non constituées ?', a: '<strong>Réponse :</strong> Il peut rejeter la demande de sursis ou prendre des <strong>mesures conservatoires</strong> sur les biens du contribuable.' },
+            { q: '<strong>Question 186 :</strong> Quels recours spécifiques le contribuable a-t-il si le comptable refuse le sursis ou prend des mesures conservatoires jugées excessives ?', a: '<strong>Réponse :</strong> Il peut saisir le <strong>juge du référé fiscal</strong> (L279, L279A LPF - juge administratif ou judiciaire selon l\'impôt) pour contester le refus de sursis ou demander la limitation/mainlevée des mesures conservatoires. Il peut aussi utiliser le <strong>référé liberté</strong> (L521-2 CJA) ou le <strong>référé suspension</strong> (L521-1 CJA) sous certaines conditions.' },
+            { q: '<strong>Question 187 :</strong> Sur quoi peuvent porter les contestations relatives au recouvrement de l\'impôt ? (L281 LPF)', a: '<strong>Réponse :</strong><ol><li>Sur la <strong>régularité en la forme</strong> de l\'acte de poursuite.</li><li>Sur l\'<strong>obligation au paiement</strong>, le <strong>montant</strong> de la dette (compte tenu des paiements) ou l\'<strong>exigibilité</strong> de la somme (à l\'exclusion des amendes/condamnations pécuniaires).</li></ol>Elles ne peuvent <em>pas</em> remettre en cause le bien-fondé de la créance elle-même.' },
+            { q: '<strong>Question 188 :</strong> Une réclamation préalable est-elle obligatoire pour contester un acte de recouvrement fiscal ? (L281 LPF)', a: '<strong>Réponse :</strong> Oui, la contestation doit d\'abord être adressée à l\'<strong>administration dont dépend le comptable</strong> qui exerce les poursuites.' },
+            { q: '<strong>Question 189 :</strong> Dans quel délai cette réclamation doit-elle être formée ? (R281-3-1 LPF)', a: '<strong>Réponse :</strong> Dans un délai de <strong>deux mois</strong> à partir de la notification de l\'acte contesté.' },
+            { q: '<strong>Question 190 :</strong> Quel juge est compétent pour connaître des contestations portant sur la régularité formelle d\'un acte de poursuite ? Sur l\'obligation au paiement ou l\'exigibilité ?', a: '<strong>Réponse :</strong> Le <strong>juge de l\'exécution (JEX)</strong> pour la régularité formelle des actes de poursuite. Le <strong>juge de l\'impôt</strong> (administratif ou judiciaire selon la nature de l\'impôt) pour les contestations sur l\'obligation de payer, le montant ou l\'exigibilité.' },
+            { q: '<strong>Question 191 :</strong> Pourquoi le créancier d\'une collectivité territoriale (CT) ne peut-il pas se fonder uniquement sur l\'inscription de sa créance au budget pour en exiger le paiement ?', a: '<strong>Réponse :</strong> Parce que l\'inscription au budget n\'est qu\'une <strong>autorisation de dépenser</strong> et n\'ouvre pas de droit direct au profit des créanciers. Le paiement nécessite un <strong>mandatement</strong> (ou ordonnancement) par l\'ordonnateur.' },
+            { q: '<strong>Question 192 :</strong> Quelle est la définition légale d\'une dépense obligatoire pour une collectivité territoriale ? (Article L1612-15 al 1er CGCT)', a: '<strong>Réponse :</strong> Ce sont :<ol><li>Les dépenses nécessaires à l\'<strong>acquittement des dettes exigibles</strong>.</li><li>Les dépenses pour lesquelles <strong>la loi l\'a expressément décidé</strong>.</li></ol>' },
+            { q: '<strong>Question 193 :</strong> Quelles sont les caractéristiques d\'une "dette exigible" au sens de cette disposition (jurisprudence) ?', a: '<strong>Réponse :</strong> La dette doit être : <strong>Échue</strong> (le terme est arrivé), <strong>Certaine</strong> (non sérieusement contestée dans son principe), <strong>Liquide</strong> (montant déterminé ou facilement déterminable), et issue d\'une source d\'obligation reconnue (loi, contrat, délit...). <em>CE, 8 décembre 2003, Commune de Maurepas</em> ; <em>CE, 17 décembre 2003, Scté Natexis-Banque Populaire.</em>' },
+            { q: '<strong>Question 194 :</strong> Dans quel cas la procédure de mandatement d\'office (MED) peut-elle être utilisée ?', a: '<strong>Réponse :</strong> Lorsqu\'une <strong>dépense obligatoire</strong> a été engagée et liquidée mais que l\'ordonnateur (maire, président...) <strong>refuse ou omet de la mandater</strong> (donner l\'ordre de payer au comptable).' },
+            { q: '<strong>Question 195 :</strong> Qui déclenche la procédure de MED ?', a: '<strong>Réponse :</strong> Le <strong>préfet</strong> (représentant de l\'État dans le département), qui met en demeure l\'ordonnateur de mandater la dépense.' },
+            { q: '<strong>Question 196 :</strong> Que se passe-t-il si l\'ordonnateur ne mandate pas la dépense dans le délai d\'un mois (ou deux mois si dépense > 5% section fonctionnement) suivant la mise en demeure ?', a: '<strong>Réponse :</strong> Le <strong>préfet y procède d\'office</strong>. Il se substitue à l\'ordonnateur pour donner l\'ordre de paiement au comptable.' },
+            { q: '<strong>Question 197 :</strong> La mise en demeure du préfet est-elle un acte susceptible de recours ? Le mandatement d\'office par le préfet l\'est-il ?', a: '<strong>Réponse :</strong> La <strong>mise en demeure n\'est pas un acte faisant grief</strong> (acte préparatoire). Le <strong>mandatement d\'office est un acte faisant grief</strong>, susceptible de recours pour excès de pouvoir devant le juge administratif par la collectivité territoriale.' },
+            { q: '<strong>Question 198 :</strong> Le refus du préfet de procéder au mandatement d\'office engage-t-il la responsabilité de l\'État ? Sous quelle condition ?', a: '<strong>Réponse :</strong> Oui, il peut engager la responsabilité de l\'État pour <strong>faute lourde</strong> si ce refus cause un préjudice au créancier. CE, 5 juillet 2018, <em>Ministre de l\'intérieur c/ département des Bouches du Rhône.</em>' },
+            { q: '<strong>Question 199 :</strong> Le préfet qui a mandaté d\'office peut-il réquisitionner le comptable si celui-ci refuse de payer ? Quelle jurisprudence ?', a: '<strong>Réponse :</strong> Non, les textes ne le prévoient pas. CAA Versailles, 21 juin 2012, <em>Marie-Hélène Montravers.</em>' },
+            { q: '<strong>Question 200 :</strong> Dans quels cas la procédure de MED est-elle exclue ?', a: '<strong>Réponse :</strong> Si la dépense n\'est pas obligatoire, si elle fait l\'objet d\'une contestation sérieuse, ou s\'il y a absence ou insuffisance de crédits disponibles au budget.' },
+            { q: '<strong>Question 201 :</strong> Quand la procédure d\'inscription d\'office est-elle utilisée ?', a: '<strong>Réponse :</strong> Lorsqu\'une <strong>dépense obligatoire n\'a pas été inscrite au budget</strong> de la collectivité territoriale, ou y a été inscrite pour une <strong>somme insuffisante</strong>.' },
+            { q: '<strong>Question 202 :</strong> Qui peut saisir la Chambre Régionale des Comptes (CRC) pour constater ce défaut d\'inscription ?', a: '<strong>Réponse :</strong> Le <strong>préfet</strong>, le <strong>comptable public</strong> concerné, ou <strong>toute personne y ayant intérêt</strong> (notamment le créancier).' },
+            { q: '<strong>Question 203 :</strong> Quelle est la procédure devant la CRC ?', a: '<strong>Réponse :</strong><ol><li>Saisine motivée.</li><li>La CRC constate dans un délai d\'un mois si la dépense est obligatoire et si elle manque au budget.</li><li>Elle adresse une <strong>mise en demeure</strong> à la collectivité pour qu\'elle inscrive la dépense.</li></ol>' },
+            { q: '<strong>Question 204 :</strong> Que se passe-t-il si la collectivité n\'inscrit pas la dépense au budget dans le mois suivant la mise en demeure de la CRC ?', a: '<strong>Réponse :</strong> La CRC demande au <strong>préfet d\'inscrire cette dépense au budget</strong>. Le préfet règle et rend exécutoire le budget rectifié, en dégageant si nécessaire les ressources (réduction dépenses facultatives, création ressources).' },
+            { q: '<strong>Question 205 :</strong> Les avis et mises en demeure de la CRC sont-ils des décisions juridictionnelles ? Sont-ils susceptibles de recours ?', a: '<strong>Réponse :</strong> Non, ce sont des <strong>actes administratifs</strong>. Les avis constatant qu\'une dépense n\'est pas obligatoire ou que la saisine est irrecevable <strong>font grief</strong> et peuvent faire l\'objet d\'un recours devant le juge administratif. Les avis constatant le caractère obligatoire et les MED <strong>ne font pas grief</strong>. <em>CE, 18 novembre 1998, Association de gestion de l\'école privée du Sacré Cœur.</em>' },
+            { q: '<strong>Question 206 :</strong> Le préfet est-il tenu de suivre l\'avis de la CRC lui demandant d\'inscrire la dépense ?', a: '<strong>Réponse :</strong> Il n\'est <strong>pas strictly tenu</strong> par les propositions de la CRC sur les modalités de financement, mais s\'il s\'en écarte, il doit motiver sa décision. Sa décision d\'inscription d\'office est susceptible de recours pour excès de pouvoir.' },
+            { q: '<strong>Question 207 :</strong> Ces procédures (MED, inscription d\'office) s\'appliquent-elles aux dépenses résultant d\'une décision de justice passée en force de chose jugée ? (L1612-17 CGCT)', a: '<strong>Réponse :</strong> Non, ces dépenses sont régies par la loi du 16 juillet 1980.' },
+            { q: '<strong>Question 208 :</strong> Quel est le délai imparti à une collectivité territoriale (ou EP) pour mandater ou ordonnancer une somme due en vertu d\'une décision de justice passée en force de chose jugée ? (Article 1er Loi 1980)', a: '<strong>Réponse :</strong> <strong>Deux mois</strong> à compter de la notification de la décision de justice à la collectivité.' },
+            { q: '<strong>Question 209 :</strong> Que peut faire le créancier si le mandatement n\'intervient pas dans ce délai ?', a: '<strong>Réponse :</strong> Il peut saisir le <strong>préfet</strong> (ou l\'autorité de tutelle pour un EP) pour qu\'il <strong>procède d\'office au mandatement</strong>.' },
+            { q: '<strong>Question 210 :</strong> Que se passe-t-il en cas d\'insuffisance de crédits au budget ?', a: '<strong>Réponse :</strong> Le préfet (ou autorité de tutelle) adresse une <strong>mise en demeure</strong> à la collectivité de créer les ressources nécessaires. S\'il n\'est pas suivi d\'effet, il procède à l\'<strong>inscription d\'office</strong> du crédit au budget et au mandatement d\'office.' },
+            { q: '<strong>Question 211 :</strong> La saisine de la CRC est-elle nécessaire dans ce cas ?', a: '<strong>Réponse :</strong> Non, la procédure de la loi de 1980 se substitue à celle de l\'article L1612-15.' },
+            { q: '<strong>Question 212 :</strong> Quelle simplification le décret de 2008 apporte-t-il pour le créancier ?', a: '<strong>Réponse :</strong> Si l\'ordonnancement n\'est pas intervenu et que le créancier n\'a pas reçu la LRAR l\'en informant, il peut s\'adresser <strong>directement au comptable public</strong> en présentant la décision de justice exécutoire pour obtenir paiement (paiement sans ordonnancement préalable).' },
+            { q: '<strong>Question 213 :</strong> Qu\'est-ce que le référé-provision ?', a: '<strong>Réponse :</strong> C\'est une procédure <strong>accélérée</strong> permettant à un créancier d\'obtenir rapidement du juge des référés administratifs le versement d\'une <strong>avance (provision)</strong> sur une somme due par une personne publique.' },
+            { q: '<strong>Question 214 :</strong> Quelle est la condition principale pour obtenir une provision ?', a: '<strong>Réponse :</strong> L\'existence de l\'obligation de la personne publique ne doit <strong>pas être sérieusement contestable</strong>. La créance doit être évidente.' },
+            { q: '<strong>Question 215 :</strong> Faut-il prouver une urgence ? Faut-il introduire un recours au fond parallèlement ?', a: '<strong>Réponse :</strong> Non, l\'<strong>urgence n\'est pas une condition</strong>. Il n\'est <strong>pas obligatoire</strong> d\'introduire un recours au fond.' },
+            { q: '<strong>Question 216 :</strong> Quelle est la procédure ?', a: '<strong>Réponse :</strong> Requête motivée (objet, faits, bien-fondé), instruction accélérée et contradictoire, audience possible, ordonnance du juge des référés (Psdt TA ou magistrat désigné).' },
+            { q: '<strong>Question 217 :</strong> L\'ordonnance accordant la provision est-elle immédiatement exécutoire ? Est-elle susceptible d\'appel ?', a: '<strong>Réponse :</strong> Oui, elle est exécutoire. Elle est susceptible d\'<strong>appel</strong> devant la CAA dans les 15 jours. L\'appel n\'est pas suspensif, mais un sursis à exécution peut être demandé.' },
+            { q: '<strong>Question 218 :</strong> Si la personne publique condamnée en référé ne paie pas, quelles procédures le créancier peut-il utiliser ?', a: '<strong>Réponse :</strong> Il peut utiliser les procédures vues précédemment (Loi de 1980 car l\'ordonnance de référé est une décision de justice exécutoire).' }
+        ];
+        // --- Fin du contenu de data.js ---
+
+        // --- Contenu de script.js ---
+        const questionArea = document.getElementById('question-area');
+        const answerArea = document.getElementById('answer-area');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        const correctBtn = document.getElementById('correct-btn');
+        const incorrectBtn = document.getElementById('incorrect-btn');
+        const feedbackButtons = document.getElementById('feedback-buttons');
+        const remainingCountEl = document.getElementById('remaining-count');
+        const totalCountEl = document.getElementById('total-count');
+        const completionMessageEl = document.getElementById('completion-message');
+        const flashcardContainerEl = document.getElementById('flashcard-container');
+        const restartBtn = document.getElementById('restart-btn');
+        const validatedListEl = document.getElementById('validated-list');
+        const toReviewListEl = document.getElementById('to-review-list');
+        const trackingListsContainerEl = document.getElementById('tracking-lists-container');
+
+        let questionsToAsk = [];
+        let currentQuestionGlobalIndex = -1;
+        let originalTotal = 0;
+        let validatedIndices = [];
+        let toReviewIndices = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function stripHtml(html) {
+           const tmp = document.createElement("DIV");
+           tmp.innerHTML = html.replace(/<br\s*\/?>/gi, ' ');
+           let text = tmp.textContent || tmp.innerText || "";
+           return text.replace(/^(Question\s*\d+\s*:|Réponse\s*:)\s*/i, '').trim();
+        }
+
+        function showQuestionDetails(index) {
+            if (index >= 0 && index < flashcardsData.length) {
+                const data = flashcardsData[index];
+                alert(`Question #${index + 1}:\n\n${stripHtml(data.q)}\n\nRéponse:\n${stripHtml(data.a)}`);
+            }
+        }
+
+        function updateDisplayLists() {
+            if (!validatedListEl || !toReviewListEl) return;
+
+            validatedListEl.innerHTML = '';
+            toReviewListEl.innerHTML = '';
+
+            const sortedValidated = [...validatedIndices].sort((a,b) => a - b);
+            sortedValidated.forEach(index => {
+                if (flashcardsData[index]) {
+                    const li = document.createElement('li');
+                    li.dataset.index = index;
+                    li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`;
+                    li.addEventListener('click', () => showQuestionDetails(index));
+                    validatedListEl.appendChild(li);
+                }
+            });
+
+            const sortedToReview = [...toReviewIndices].sort((a,b) => a - b);
+            sortedToReview.forEach(index => {
+                 if (flashcardsData[index]) {
+                    const li = document.createElement('li');
+                    li.dataset.index = index;
+                    li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`;
+                    li.addEventListener('click', () => showQuestionDetails(index));
+                    toReviewListEl.appendChild(li);
+                }
+            });
+        }
+
+        function loadNextQuestion() {
+            answerArea.classList.add('hidden');
+            feedbackButtons.classList.add('hidden');
+            showAnswerBtn.classList.remove('hidden');
+            questionArea.innerHTML = "";
+            answerArea.innerHTML = "";
+            currentQuestionGlobalIndex = -1;
+
+            if (questionsToAsk.length === 0) {
+                flashcardContainerEl.classList.add('hidden');
+                trackingListsContainerEl.classList.remove('hidden');
+                completionMessageEl.classList.remove('hidden');
+                updateStatus();
+                return;
+            }
+
+            flashcardContainerEl.classList.remove('hidden');
+            completionMessageEl.classList.add('hidden');
+            trackingListsContainerEl.classList.remove('hidden');
+
+            currentQuestionGlobalIndex = questionsToAsk[0];
+
+            if (typeof flashcardsData === 'undefined' || flashcardsData === null) {
+                 console.error("ERREUR: flashcardsData non défini.");
+                 questionArea.innerHTML = "Erreur: Données non chargées.";
+                 return;
+            }
+            if (currentQuestionGlobalIndex < 0 || currentQuestionGlobalIndex >= flashcardsData.length || flashcardsData[currentQuestionGlobalIndex] === undefined) {
+                console.error(`ERREUR: Index (${currentQuestionGlobalIndex}) ou données invalides.`);
+                questionArea.innerHTML = "Erreur: Index/Données invalides.";
+                questionsToAsk.shift();
+                setTimeout(loadNextQuestion, 50);
+                return;
+            }
+
+            const currentQuestionData = flashcardsData[currentQuestionGlobalIndex];
+
+            if (currentQuestionData && currentQuestionData.q && currentQuestionData.a) {
+                questionArea.innerHTML = currentQuestionData.q;
+                answerArea.innerHTML = currentQuestionData.a;
+            } else {
+                console.error("ERREUR: Données de carte invalides pour l'index", currentQuestionGlobalIndex, currentQuestionData);
+                questionArea.innerHTML = `Erreur: Données invalides pour carte ${currentQuestionGlobalIndex}.`;
+                questionsToAsk.shift();
+                setTimeout(loadNextQuestion, 50);
+                return;
+            }
+            updateStatus();
+        }
+
+        function updateStatus() {
+            if (remainingCountEl && totalCountEl) {
+                remainingCountEl.textContent = questionsToAsk.length;
+                totalCountEl.textContent = originalTotal;
+            }
+        }
+
+        function handleShowAnswer() {
+            answerArea.classList.remove('hidden');
+            showAnswerBtn.classList.add('hidden');
+            feedbackButtons.classList.remove('hidden');
+        }
+
+        function handleCorrect() {
+            if (currentQuestionGlobalIndex === -1) return;
+
+            const reviewIndex = toReviewIndices.indexOf(currentQuestionGlobalIndex);
+            if (reviewIndex > -1) {
+                toReviewIndices.splice(reviewIndex, 1);
+            }
+            if (!validatedIndices.includes(currentQuestionGlobalIndex)) {
+                validatedIndices.push(currentQuestionGlobalIndex);
+            }
+
+            questionsToAsk.shift();
+            updateDisplayLists();
+            loadNextQuestion();
+        }
+
+        // MODIFIÉ: Logique pour réinsérer après 3 cartes
+        function handleIncorrect() {
+            if (currentQuestionGlobalIndex === -1) return; // Sécurité si pas de question chargée
+
+            // Mettre à jour les listes de suivi (ajouter à "à revoir", retirer de "validées")
+            const validatedIndexPos = validatedIndices.indexOf(currentQuestionGlobalIndex);
+            if (validatedIndexPos > -1) {
+                validatedIndices.splice(validatedIndexPos, 1);
+            }
+            if (!toReviewIndices.includes(currentQuestionGlobalIndex)) {
+                toReviewIndices.push(currentQuestionGlobalIndex);
+            }
+            updateDisplayLists(); // Mettre à jour l'affichage des listes
+
+            // Logique de réinsertion différée
+            const failedQuestionIndex = questionsToAsk.shift(); // Retirer l'index échoué du début
+
+            // Calculer l'indice où insérer : après 3 cartes (donc à l'index 3),
+            // mais pas plus loin que la fin de la liste actuelle.
+            // Si 0, 1 ou 2 cartes restent, on insère à la fin. Si 3 ou plus, on insère à l'index 3.
+            const insertionIndex = Math.min(3, questionsToAsk.length);
+
+            // Insérer l'index échoué à la position calculée
+            questionsToAsk.splice(insertionIndex, 0, failedQuestionIndex);
+
+            // Charger la question suivante (qui est maintenant à l'index 0)
+            // NE PAS remélanger ici pour conserver l'ordre de réapparition
+            loadNextQuestion();
+        }
+
+
+        function initializeApp() {
+             if (typeof flashcardsData === 'undefined' || !Array.isArray(flashcardsData) || flashcardsData.length === 0) {
+                 console.error("ERREUR CRITIQUE: flashcardsData est vide ou non défini.");
+                 document.body.innerHTML = '<h1 style="color:red; text-align:center;">Erreur: Impossible de charger les données des flashcards. Vérifiez la section &lt;script&gt; dans le fichier HTML.</h1>';
+                 return;
+             }
+
+            questionsToAsk = flashcardsData.map((_, index) => index);
+            originalTotal = questionsToAsk.length;
+            validatedIndices = [];
+            toReviewIndices = [];
+            currentQuestionGlobalIndex = -1;
+
+            shuffleArray(questionsToAsk); // Mélange initial
+
+             if (!flashcardContainerEl || !completionMessageEl || !questionArea || !answerArea || !showAnswerBtn || !feedbackButtons || !restartBtn || !remainingCountEl || !totalCountEl || !validatedListEl || !toReviewListEl || !trackingListsContainerEl) {
+                 console.error("ERREUR CRITIQUE: Un ou plusieurs éléments HTML essentiels sont manquants. Vérifiez les ID dans la section HTML.");
+                 alert("Erreur critique: Elements HTML manquants. Vérifiez la console.");
+                 return;
+            }
+
+            // Réinitialiser l'interface
+            completionMessageEl.classList.add('hidden');
+            flashcardContainerEl.classList.remove('hidden');
+            trackingListsContainerEl.classList.remove('hidden');
+            showAnswerBtn.disabled = false;
+            updateDisplayLists();
+
+            loadNextQuestion();
+        }
+
+        // --- Écouteurs d'événements ---
+        if (showAnswerBtn) showAnswerBtn.addEventListener('click', handleShowAnswer);
+        if (correctBtn) correctBtn.addEventListener('click', handleCorrect);
+        if (incorrectBtn) incorrectBtn.addEventListener('click', handleIncorrect);
+        if (restartBtn) restartBtn.addEventListener('click', initializeApp);
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        // --- Fin du contenu de script.js ---
+    </script>
+</body>
+</html>
