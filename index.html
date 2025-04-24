@@ -5,50 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcards</title>
     <style>
-        /* --- CSS (Identique à la version précédente) --- */
-        body {
-            font-family: sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
+        /* --- CSS --- */
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        h1 { color: #333; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
 
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        #setup-screen {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 25px;
-            width: 90%;
-            max-width: 650px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: left;
-            margin-bottom: 30px;
-        }
+        #setup-screen { background-color: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 25px; width: 90%; max-width: 650px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left; margin-bottom: 30px; }
         #setup-screen h2 { margin-top: 0; text-align: center; color: #0056b3; margin-bottom: 20px; }
         .setup-section { border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
-        .setup-section:first-child { border-top: none; margin-top: 0; padding-top: 0;} /* Pas de bordure/marge pour la 1ere section */
-         .setup-section h3 { margin-top: 0; margin-bottom: 15px; color: #333; text-align: center; font-size: 1.1em; }
+        .setup-section:first-child { border-top: none; margin-top: 0; padding-top: 0;}
+        .setup-section h3 { margin-top: 0; margin-bottom: 15px; color: #333; text-align: center; font-size: 1.1em; }
         .setup-option { margin-bottom: 15px; }
         .setup-option label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .setup-option input[type="radio"], .setup-option input[type="checkbox"] { margin-right: 8px; vertical-align: middle; }
+        .setup-option input[type="radio"], .setup-option input[type="checkbox"], .setup-option input[type="number"] { margin-right: 8px; vertical-align: middle; }
+        .setup-option input[type="number"] { width: 60px; padding: 3px 5px; }
         .setup-option .section-list { max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; background-color: #fdfdfd; border-radius: 4px; }
         .setup-option .section-list label { font-weight: normal; display: block; margin-bottom: 3px; }
         .setup-option .section-list label input { margin-right: 5px; }
         .start-button-container { text-align: center; margin-top: 20px; }
         .start-button-container button { margin: 5px 10px; padding: 10px 20px; }
+
+        #resume-quiz-option { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; text-align: center; }
+        #resume-info { font-size: 0.9em; color: #856404; margin-bottom: 10px; }
+        #resume-quiz-btn { background-color: #ffc107; color: #333; }
+        #clear-save-btn { background: none; border: none; color: #007bff; text-decoration: underline; cursor: pointer; font-size: 0.8em; padding: 0 5px; vertical-align: middle;}
+
         #start-session-btn { background-color: #28a745; color: white; }
         #start-session-btn:hover { background-color: #218838; }
         #start-consult-btn { background-color: #17a2b8; color: white; }
@@ -119,8 +99,8 @@
         #restart-btn { background-color: #ffc107; color: #333; margin-top: 15px; display: inline-block; }
         #restart-btn:hover { background-color: #e0a800; }
 
-         #back-to-menu-btn { background-color:#6c757d; color:white; margin-top: 20px; }
-         #back-to-menu-btn:hover { background-color: #5a6268; }
+        #back-to-menu-btn { background-color:#6c757d; color:white; margin-top: 20px; }
+        #back-to-menu-btn:hover { background-color: #5a6268; }
 
         @media (max-width: 600px) {
             body { padding: 10px; }
@@ -141,13 +121,25 @@
 </head>
 <body>
 
-    <h1>Flashcards</h1>
+    <h1>Flashcards Recouvrement Créances Publiques</h1>
 
     <!-- Écran de configuration -->
     <div id="setup-screen">
         <h2>Choisir le mode</h2>
+
+        <!-- Option Reprendre Quiz -->
+        <div class="setup-section hidden" id="resume-quiz-option">
+            <h3>Quiz en cours</h3>
+            <p id="resume-info">Une session de quiz est sauvegardée.</p>
+            <div class="start-button-container">
+                <button id="resume-quiz-btn">Reprendre le Quiz</button>
+                 <button id="clear-save-btn" title="Supprimer la progression sauvegardée">Effacer</button>
+            </div>
+        </div>
+
+        <!-- Section Nouveau Quiz -->
         <div class="setup-section">
-            <h3>Mode Quiz (Apprentissage)</h3>
+            <h3><span id="new-quiz-title">Nouvelle Session Quiz</span></h3>
             <div class="setup-option">
                 <label>Ordre des questions :</label>
                 <label><input type="radio" name="order" value="random" checked> Aléatoire</label>
@@ -160,23 +152,30 @@
                 <label style="margin-top: 10px;"><input type="checkbox" id="shuffle-sections"> Mélanger les questions au sein des sections</label>
             </div>
             <div class="start-button-container">
-                <button id="start-session-btn" class="start-btn">Commencer le Quiz</button>
+                <button id="start-session-btn" class="start-btn">Commencer Nouvelle Session</button>
             </div>
         </div>
+
+         <!-- Section Consultation -->
          <div class="setup-section">
              <h3>Mode Consultation (Parcourir)</h3>
-              <p style="text-align: center; font-size: 0.9em; color: #6c757d;">Parcourez toutes les cartes dans l'ordre.</p>
+             <div class="setup-option">
+                 <label for="consult-start-card">Commencer à la carte N° :</label>
+                 <input type="number" id="consult-start-card" name="consult-start-card" min="1" placeholder="1" style="width: 70px;">
+                 <span style="font-size: 0.85em; color: #6c757d;">(Laissez vide pour commencer au début)</span>
+             </div>
              <div class="start-button-container">
                 <button id="start-consult-btn" class="start-btn">Consulter les cartes</button>
              </div>
          </div>
     </div>
 
+
     <!-- Contenu principal (Flashcard + Listes), initialement caché -->
     <div class="main-content hidden">
         <div id="flashcard-container">
             <div id="status-bar">
-                <span class="quiz-info">Questions restantes: <span id="remaining-count">0</span> | Total: <span id="total-count">0</span></span>
+                <span class="quiz-info">Restantes: <span id="remaining-count">0</span> | Total: <span id="total-count">0</span></span>
                 <span class="consult-info">Carte <span id="current-card-num">0</span> / <span id="total-cards-consult">0</span></span>
             </div>
             <div id="card">
@@ -206,16 +205,15 @@
         <!-- Fin Quiz -->
         <div id="completion-message" class="hidden">
             🎉 Félicitations ! Vous avez terminé toutes les questions du quiz. 🎉
-            <button id="restart-btn">Nouvelle Session</button>
+            <button id="restart-btn">Nouvelle Session</button> <!-- Renommé -->
         </div>
-        <!-- Retour Menu (pour les 2 modes une fois terminés ou en consultation) -->
+        <!-- Retour Menu -->
         <button id="back-to-menu-btn" class="hidden">Retour au menu</button>
     </div>
 
     <script>
         // --- Données (flashcardsData) ---
         const flashcardsData = [
-             // --- Chapitre: Principes Généraux ---
             { section: "Admin Général - Privilège Préalable", q: '<strong>Question 1 :</strong> Qu\'est-ce que le "privilège du préalable" dont bénéficie l\'administration en matière de recouvrement ?', a: '<strong>Réponse :</strong> C\'est la possibilité pour l\'administration de prendre des décisions exécutoires qui s\'imposent aux administrés sans avoir besoin de saisir préalablement un juge. Ces décisions créent unilatéralement des obligations.' },
             { section: "Admin Général - Privilège Préalable", q: '<strong>Question 2 :</strong> Quelle est la différence entre l\'autorité de la chose décidée et l\'autorité de la chose jugée ?', a: '<strong>Réponse :</strong> L\'autorité de la chose décidée concerne la capacité d\'une décision administrative à s\'imposer et à être exécutée dès son édiction. L\'autorité de la chose jugée concerne l\'irrévocabilité d\'une décision de justice et sa force exécutoire après jugement. La décision administrative n\'a pas la même force que la décision de justice.' },
             { section: "Admin Général - Privilège Préalable", q: '<strong>Question 3 :</strong> Quelle jurisprudence consacre la faculté d\'émettre une décision exécutoire comme un privilège fondamental de l\'administration ?', a: '<strong>Réponse :</strong> CE, Ass, 2 juillet 1982, <em>Huglo et Lepage-Jessua.</em>' },
@@ -467,6 +465,14 @@
         const showAnswerConsultBtn = document.getElementById('show-answer-consult-btn');
         const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const bodyEl = document.body;
+        const resumeQuizOptionEl = document.getElementById('resume-quiz-option');
+        const resumeQuizBtn = document.getElementById('resume-quiz-btn');
+        const resumeInfoEl = document.getElementById('resume-info');
+        const clearSaveBtn = document.getElementById('clear-save-btn');
+        const consultStartCardInput = document.getElementById('consult-start-card');
+        const newQuizTitleEl = document.getElementById('new-quiz-title');
+
+        const QUIZ_STATE_KEY = 'flashcardQuizStateRecouvrement'; // Clé spécifique
 
         let questionsToAsk = [];
         let currentQuestionGlobalIndex = -1;
@@ -478,269 +484,144 @@
         let consultationCurrentIndex = 0;
         let allCardIndices = [];
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        // --- Fonctions Utilitaires ---
+        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+        function stripHtml(html) { const tmp = document.createElement("DIV"); tmp.innerHTML = html.replace(/<br\s*\/?>/gi, ' '); let text = tmp.textContent || tmp.innerText || ""; return text.replace(/^(Question\s*\d+\s*:|Réponse\s*:)\s*/i, '').trim(); }
+        function showQuestionDetails(index) { if (index >= 0 && index < flashcardsData.length) { const data = flashcardsData[index]; alert(`Question #${index + 1}:\n[${data.section || 'Section inconnue'}]\n\n${stripHtml(data.q)}\n\nRéponse:\n${stripHtml(data.a)}`); } }
 
-        function stripHtml(html) {
-           const tmp = document.createElement("DIV");
-           tmp.innerHTML = html.replace(/<br\s*\/?>/gi, ' ');
-           let text = tmp.textContent || tmp.innerText || "";
-           return text.replace(/^(Question\s*\d+\s*:|Réponse\s*:)\s*/i, '').trim();
-        }
+        // --- Sauvegarde / Chargement ---
+        function saveQuizState() { if (isConsultationMode || !questionsToAsk || questionsToAsk.length === 0) return; try { const state = { questionsToAsk, validatedIndices, toReviewIndices, originalTotal, timestamp: Date.now() }; localStorage.setItem(QUIZ_STATE_KEY, JSON.stringify(state)); console.log("Quiz state saved."); } catch (e) { console.error("Error saving quiz state:", e); } }
+        function loadQuizState() { try { const savedState = localStorage.getItem(QUIZ_STATE_KEY); if (savedState) { const state = JSON.parse(savedState); if (Array.isArray(state.questionsToAsk) && Array.isArray(state.validatedIndices) && Array.isArray(state.toReviewIndices) && typeof state.originalTotal === 'number') { return state; } else { console.warn("Saved quiz state is invalid. Clearing."); clearQuizState(); return null; } } } catch (e) { console.error("Error loading quiz state:", e); clearQuizState(); } return null; }
+        function clearQuizState() { try { localStorage.removeItem(QUIZ_STATE_KEY); console.log("Quiz state cleared."); showSetupScreen(); } catch (e) { console.error("Error clearing quiz state:", e); } }
 
-        function showQuestionDetails(index) {
-            if (index >= 0 && index < flashcardsData.length) {
-                const data = flashcardsData[index];
-                alert(`Question #${index + 1}:\n[${data.section || 'Section inconnue'}]\n\n${stripHtml(data.q)}\n\nRéponse:\n${stripHtml(data.a)}`);
-            }
-        }
-
-        function updateDisplayLists() {
-            if (!validatedListEl || !toReviewListEl) return;
-            validatedListEl.innerHTML = '';
-            toReviewListEl.innerHTML = '';
-            const sortedValidated = [...validatedIndices].sort((a,b) => a - b);
-            sortedValidated.forEach(index => {
-                if (flashcardsData[index]) {
-                    const li = document.createElement('li'); li.dataset.index = index;
-                    li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`;
-                    li.title = `Section: ${flashcardsData[index].section || 'N/A'}`;
-                    li.addEventListener('click', () => showQuestionDetails(index));
-                    validatedListEl.appendChild(li);
-                }
-            });
-            const sortedToReview = [...toReviewIndices].sort((a,b) => a - b);
-            sortedToReview.forEach(index => {
-                 if (flashcardsData[index]) {
-                    const li = document.createElement('li'); li.dataset.index = index;
-                    li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`;
-                    li.title = `Section: ${flashcardsData[index].section || 'N/A'}`;
-                    li.addEventListener('click', () => showQuestionDetails(index));
-                    toReviewListEl.appendChild(li);
-                }
-            });
-        }
+        // --- Interface et Logique ---
+        function updateDisplayLists() { if (!validatedListEl || !toReviewListEl) return; validatedListEl.innerHTML = ''; toReviewListEl.innerHTML = ''; const sortedValidated = [...validatedIndices].sort((a,b) => a - b); sortedValidated.forEach(index => { if (flashcardsData[index]) { const li = document.createElement('li'); li.dataset.index = index; li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`; li.title = `Section: ${flashcardsData[index].section || 'N/A'}`; li.addEventListener('click', () => showQuestionDetails(index)); validatedListEl.appendChild(li); } }); const sortedToReview = [...toReviewIndices].sort((a,b) => a - b); sortedToReview.forEach(index => { if (flashcardsData[index]) { const li = document.createElement('li'); li.dataset.index = index; li.textContent = `(#${index + 1}) ${stripHtml(flashcardsData[index].q)}`; li.title = `Section: ${flashcardsData[index].section || 'N/A'}`; li.addEventListener('click', () => showQuestionDetails(index)); toReviewListEl.appendChild(li); } }); }
 
         function loadCard(globalIndex) {
-            answerArea.classList.add('hidden');
-            feedbackButtons.classList.add('hidden');
-            // On montrera le bon bouton "Afficher" plus tard selon le mode
-            showAnswerBtn.classList.add('hidden');
-            showAnswerConsultBtn.classList.add('hidden');
-
-
-            currentQuestionGlobalIndex = globalIndex;
-
-            if (globalIndex < 0 || globalIndex >= flashcardsData.length || !flashcardsData[globalIndex]) {
-                console.error(`ERREUR: Index (${globalIndex}) ou données invalides pour loadCard.`);
-                questionArea.innerHTML = "Erreur: Carte invalide.";
-                answerArea.innerHTML = "";
-                return false;
-            }
-
-            const cardData = flashcardsData[globalIndex];
-            if (cardData && cardData.q && cardData.a) {
-                questionArea.innerHTML = cardData.q;
-                answerArea.innerHTML = cardData.a;
-
-                 // Afficher le bouton "Afficher Réponse" approprié au mode
-                 if (isConsultationMode) {
-                     showAnswerConsultBtn.classList.remove('hidden');
-                 } else {
-                     showAnswerBtn.classList.remove('hidden');
-                 }
-
-                return true;
-            } else {
-                console.error("ERREUR: Données de carte invalides pour l'index", globalIndex, cardData);
-                questionArea.innerHTML = `Erreur: Données invalides pour carte #${globalIndex + 1}.`;
-                answerArea.innerHTML = "";
-                return false;
-            }
+             answerArea.classList.add('hidden'); feedbackButtons.classList.add('hidden');
+             showAnswerBtn.classList.add('hidden'); showAnswerConsultBtn.classList.add('hidden');
+             currentQuestionGlobalIndex = globalIndex;
+             if (globalIndex < 0 || globalIndex >= flashcardsData.length || !flashcardsData[globalIndex]) { console.error(`ERREUR: Index (${globalIndex}) invalide.`); questionArea.innerHTML = "Erreur: Carte invalide."; answerArea.innerHTML = ""; return false; }
+             const cardData = flashcardsData[globalIndex];
+             if (cardData && cardData.q && cardData.a) {
+                 questionArea.innerHTML = cardData.q; answerArea.innerHTML = cardData.a;
+                 if (isConsultationMode) { showAnswerConsultBtn.classList.remove('hidden'); } else { showAnswerBtn.classList.remove('hidden'); }
+                 return true;
+             } else { console.error("ERREUR: Données invalides", globalIndex, cardData); questionArea.innerHTML = `Erreur: Données invalides ${globalIndex + 1}.`; answerArea.innerHTML = ""; return false; }
         }
 
-        function updateStatus() {
-            if (isConsultationMode) {
-                if (currentCardNumEl && totalCardsConsultEl) {
-                    currentCardNumEl.textContent = consultationCurrentIndex + 1;
-                    totalCardsConsultEl.textContent = flashcardsData.length;
-                }
-            } else {
-                if (remainingCountEl && totalCountEl) {
-                    remainingCountEl.textContent = questionsToAsk.length;
-                    totalCountEl.textContent = originalTotal;
-                }
-            }
-        }
+        function updateStatus() { if (isConsultationMode) { if (currentCardNumEl && totalCardsConsultEl) { currentCardNumEl.textContent = consultationCurrentIndex + 1; totalCardsConsultEl.textContent = flashcardsData.length; } } else { if (remainingCountEl && totalCountEl) { remainingCountEl.textContent = questionsToAsk.length; totalCountEl.textContent = originalTotal; } } }
 
         // --- Fonctions Mode Quiz ---
         function loadNextQuizQuestion() {
             if (questionsToAsk.length === 0) {
-                flashcardContainerEl.classList.add('hidden');
-                trackingListsContainerEl.classList.remove('hidden');
-                completionMessageEl.classList.remove('hidden');
-                backToMenuBtn.classList.remove('hidden');
-                updateStatus();
-                return;
+                flashcardContainerEl.classList.add('hidden'); trackingListsContainerEl.classList.remove('hidden');
+                completionMessageEl.classList.remove('hidden'); backToMenuBtn.classList.remove('hidden');
+                updateStatus(); clearQuizState(); return;
             }
-
-            // S'assurer que l'interface est correcte pour une nouvelle carte de quiz
-            flashcardContainerEl.classList.remove('hidden');
-            completionMessageEl.classList.add('hidden');
-            trackingListsContainerEl.classList.remove('hidden');
-            backToMenuBtn.classList.add('hidden');
-
+            flashcardContainerEl.classList.remove('hidden'); completionMessageEl.classList.add('hidden');
+            trackingListsContainerEl.classList.remove('hidden'); backToMenuBtn.classList.add('hidden');
             const success = loadCard(questionsToAsk[0]);
-            if (success) {
-                updateStatus();
-            } else {
-                questionsToAsk.shift();
-                setTimeout(loadNextQuizQuestion, 50);
-            }
+            if (success) { updateStatus(); } else { questionsToAsk.shift(); setTimeout(loadNextQuizQuestion, 50); }
         }
-
-        function handleShowAnswer() { // Mode Quiz
-            answerArea.classList.remove('hidden');
-            showAnswerBtn.classList.add('hidden');
-            feedbackButtons.classList.remove('hidden');
-        }
-
-        function handleCorrect() {
-            if (currentQuestionGlobalIndex === -1) return;
-            const reviewIndex = toReviewIndices.indexOf(currentQuestionGlobalIndex);
-            if (reviewIndex > -1) { toReviewIndices.splice(reviewIndex, 1); }
-            if (!validatedIndices.includes(currentQuestionGlobalIndex)) { validatedIndices.push(currentQuestionGlobalIndex); }
-            questionsToAsk.shift();
-            updateDisplayLists();
-            loadNextQuizQuestion();
-        }
-
-        function handleIncorrect() {
-            if (currentQuestionGlobalIndex === -1) return;
-            const validatedIndexPos = validatedIndices.indexOf(currentQuestionGlobalIndex);
-            if (validatedIndexPos > -1) { validatedIndices.splice(validatedIndexPos, 1); }
-            if (!toReviewIndices.includes(currentQuestionGlobalIndex)) { toReviewIndices.push(currentQuestionGlobalIndex); }
-            updateDisplayLists();
-            const failedQuestionIndex = questionsToAsk.shift();
-            const insertionIndex = Math.min(3, questionsToAsk.length);
-            questionsToAsk.splice(insertionIndex, 0, failedQuestionIndex);
-            loadNextQuizQuestion();
-        }
+        function handleShowAnswer() { answerArea.classList.remove('hidden'); showAnswerBtn.classList.add('hidden'); feedbackButtons.classList.remove('hidden'); }
+        function handleCorrect() { if (currentQuestionGlobalIndex === -1) return; const reviewIndex = toReviewIndices.indexOf(currentQuestionGlobalIndex); if (reviewIndex > -1) { toReviewIndices.splice(reviewIndex, 1); } if (!validatedIndices.includes(currentQuestionGlobalIndex)) { validatedIndices.push(currentQuestionGlobalIndex); } questionsToAsk.shift(); updateDisplayLists(); saveQuizState(); loadNextQuizQuestion(); }
+        function handleIncorrect() { if (currentQuestionGlobalIndex === -1) return; const validatedIndexPos = validatedIndices.indexOf(currentQuestionGlobalIndex); if (validatedIndexPos > -1) { validatedIndices.splice(validatedIndexPos, 1); } if (!toReviewIndices.includes(currentQuestionGlobalIndex)) { toReviewIndices.push(currentQuestionGlobalIndex); } updateDisplayLists(); const failedQuestionIndex = questionsToAsk.shift(); const insertionIndex = Math.min(3, questionsToAsk.length); questionsToAsk.splice(insertionIndex, 0, failedQuestionIndex); saveQuizState(); loadNextQuizQuestion(); }
 
         // --- Fonctions Mode Consultation ---
         function loadConsultationCard(index) {
-            consultationCurrentIndex = index;
-            const success = loadCard(index); // Charge la carte
-
-            if (success) {
-                updateStatus(); // Met à jour le compteur "Carte X / Y"
-                prevBtn.disabled = (consultationCurrentIndex === 0);
-                nextBtn.disabled = (consultationCurrentIndex === flashcardsData.length - 1);
-            } else {
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-            }
-             // Assurer que le bouton Afficher est visible (car loadCard le cache par défaut maintenant)
-             showAnswerConsultBtn.classList.remove('hidden');
-             answerArea.classList.add('hidden'); // Cacher la réponse à chaque navigation
+             consultationCurrentIndex = index;
+             const success = loadCard(index);
+             if (success) { updateStatus(); prevBtn.disabled = (consultationCurrentIndex === 0); nextBtn.disabled = (consultationCurrentIndex === flashcardsData.length - 1); }
+             else { prevBtn.disabled = true; nextBtn.disabled = true; }
+             showAnswerConsultBtn.classList.remove('hidden'); // S'assurer qu'il est visible
+             answerArea.classList.add('hidden');
         }
-
-        function handleShowAnswerConsult() { // Mode Consultation
-             answerArea.classList.remove('hidden');
-             showAnswerConsultBtn.classList.add('hidden'); // Cache après clic
-         }
-
-        function handleConsultationNext() {
-            if (consultationCurrentIndex < flashcardsData.length - 1) {
-                loadConsultationCard(consultationCurrentIndex + 1);
-            }
-        }
-
-        function handleConsultationPrevious() {
-            if (consultationCurrentIndex > 0) {
-                loadConsultationCard(consultationCurrentIndex - 1);
-            }
-        }
-
+        function handleShowAnswerConsult() { answerArea.classList.remove('hidden'); showAnswerConsultBtn.classList.add('hidden'); }
+        function handleConsultationNext() { if (consultationCurrentIndex < flashcardsData.length - 1) { loadConsultationCard(consultationCurrentIndex + 1); } }
+        function handleConsultationPrevious() { if (consultationCurrentIndex > 0) { loadConsultationCard(consultationCurrentIndex - 1); } }
 
         // --- Démarrage des modes ---
-        function startQuiz() {
-            isConsultationMode = false;
-            bodyEl.className = 'mode-quiz'; // Définit le mode
-
-            const selectedOrder = document.querySelector('input[name="order"]:checked').value;
-            let initialIndices = [];
-
-            if (selectedOrder === 'chrono') {
-                initialIndices = flashcardsData.map((_, index) => index);
-            } else if (selectedOrder === 'section') {
-                const selectedCheckboxes = document.querySelectorAll('#section-checkboxes input[name="sections"]:checked');
-                const selectedSections = Array.from(selectedCheckboxes).map(cb => cb.value);
-                if (selectedSections.length === 0) { alert("Veuillez sélectionner au moins une section."); return; }
-                initialIndices = flashcardsData
-                    .map((card, index) => ({ card, index }))
-                    .filter(item => selectedSections.includes(item.card.section || "Sans Section"))
-                    .map(item => item.index);
-                if (shuffleSectionsCheckbox && shuffleSectionsCheckbox.checked) { shuffleArray(initialIndices); }
-            } else { // random
-                initialIndices = flashcardsData.map((_, index) => index);
-                shuffleArray(initialIndices);
-            }
-
-            if (initialIndices.length === 0) { alert("Aucune question trouvée pour la sélection actuelle."); return; }
-
-            questionsToAsk = [...initialIndices];
-            originalTotal = questionsToAsk.length;
-            validatedIndices = []; toReviewIndices = []; currentQuestionGlobalIndex = -1;
-
+        function setupUIForMode(mode) {
+            bodyEl.className = mode; // mode-quiz ou mode-consultation
             setupScreenEl.classList.add('hidden');
             mainContentEl.classList.remove('hidden');
             completionMessageEl.classList.add('hidden');
             flashcardContainerEl.classList.remove('hidden');
-            trackingListsContainerEl.classList.remove('hidden');
-            backToMenuBtn.classList.add('hidden');
+            backToMenuBtn.classList.remove('hidden'); // Toujours visible une fois démarré
 
-            // Afficher/Masquer les contrôles
-            showAnswerBtn.classList.remove('hidden');
-            feedbackButtons.classList.add('hidden'); // Sera montré après clic sur showAnswerBtn
-            showAnswerConsultBtn.classList.add('hidden');
-            consultNavButtons.classList.add('hidden');
+             // Afficher/Masquer les éléments spécifiques
+            trackingListsContainerEl.classList.toggle('hidden', mode === 'mode-consultation');
+            showAnswerBtn.classList.toggle('hidden', mode === 'mode-consultation');
+            feedbackButtons.classList.add('hidden'); // Toujours caché au début d'une carte
+            showAnswerConsultBtn.classList.toggle('hidden', mode === 'mode-quiz');
+            consultNavButtons.classList.toggle('hidden', mode === 'mode-quiz');
+        }
+
+        function startQuiz(resumedState = null) {
+            isConsultationMode = false;
+            setupUIForMode('mode-quiz');
+
+            if (resumedState) {
+                questionsToAsk = resumedState.questionsToAsk;
+                validatedIndices = resumedState.validatedIndices;
+                toReviewIndices = resumedState.toReviewIndices;
+                originalTotal = resumedState.originalTotal;
+                currentQuestionGlobalIndex = -1;
+                console.log("Quiz resumed.");
+            } else {
+                clearQuizState(); // Effacer l'ancienne sauvegarde pour un nouveau quiz
+                const selectedOrder = document.querySelector('input[name="order"]:checked').value;
+                let initialIndices = [];
+                if (selectedOrder === 'chrono') { initialIndices = flashcardsData.map((_, index) => index); }
+                else if (selectedOrder === 'section') {
+                    const selectedCheckboxes = document.querySelectorAll('#section-checkboxes input[name="sections"]:checked');
+                    const selectedSections = Array.from(selectedCheckboxes).map(cb => cb.value);
+                    if (selectedSections.length === 0) { alert("Veuillez sélectionner au moins une section."); showSetupScreen(); return; }
+                    initialIndices = flashcardsData.map((card, index) => ({ card, index })).filter(item => selectedSections.includes(item.card.section || "Sans Section")).map(item => item.index);
+                    if (shuffleSectionsCheckbox && shuffleSectionsCheckbox.checked) { shuffleArray(initialIndices); }
+                } else { initialIndices = flashcardsData.map((_, index) => index); shuffleArray(initialIndices); }
+                if (initialIndices.length === 0) { alert("Aucune question trouvée."); showSetupScreen(); return; }
+                questionsToAsk = [...initialIndices]; originalTotal = questionsToAsk.length;
+                validatedIndices = []; toReviewIndices = []; currentQuestionGlobalIndex = -1;
+                console.log("New quiz started.");
+            }
 
             updateDisplayLists();
             loadNextQuizQuestion();
+        }
+
+         function resumeQuiz() {
+             const savedState = loadQuizState();
+             if (savedState) {
+                 startQuiz(savedState);
+             } else {
+                 alert("Aucune session de quiz sauvegardée.");
+             }
         }
 
         function startConsultationMode() {
             isConsultationMode = true;
-            bodyEl.className = 'mode-consultation'; // Définit le mode
+            setupUIForMode('mode-consultation');
+
+            let startIndex = 0;
+            const startCardNum = parseInt(consultStartCardInput.value, 10);
+            if (!isNaN(startCardNum) && startCardNum >= 1 && startCardNum <= flashcardsData.length) {
+                startIndex = startCardNum - 1;
+            } else if (consultStartCardInput.value !== "") {
+                 alert(`Numéro de carte invalide (doit être entre 1 et ${flashcardsData.length}). Début à la carte 1.`);
+            }
 
             allCardIndices = flashcardsData.map((_, index) => index);
-            consultationCurrentIndex = 0;
-            currentQuestionGlobalIndex = -1; // Non utilisé pour la logique de nav ici
-
-            setupScreenEl.classList.add('hidden');
-            mainContentEl.classList.remove('hidden');
-            completionMessageEl.classList.add('hidden');
-            flashcardContainerEl.classList.remove('hidden');
-            trackingListsContainerEl.classList.add('hidden'); // Cacher les listes
-            backToMenuBtn.classList.remove('hidden');
-
-            // Afficher/Masquer les contrôles
-            showAnswerBtn.classList.add('hidden');
-            feedbackButtons.classList.add('hidden');
-            showAnswerConsultBtn.classList.remove('hidden');
-            consultNavButtons.classList.remove('hidden');
+            consultationCurrentIndex = startIndex;
+            currentQuestionGlobalIndex = -1; // Pas utilisé pour la nav
 
             loadConsultationCard(consultationCurrentIndex);
         }
 
 
         // --- Initialisation générale et Configuration ---
-        function populateSectionSelector() {
+        function populateSectionSelector() { /* ... (inchangée) ... */
             const sections = [...new Set(flashcardsData.map(item => item.section || "Sans Section"))].sort();
             uniqueSections = sections;
             if (sectionCheckboxesContainer) {
@@ -756,63 +637,54 @@
                     sectionCheckboxesContainer.appendChild(label);
                 });
             } else { console.error("Conteneur de checkboxes de section non trouvé."); }
-        }
+         }
 
-        // Affiche l'écran de configuration
         function showSetupScreen() {
-            // Cacher le contenu principal, messages, etc.
             mainContentEl.classList.add('hidden');
             completionMessageEl.classList.add('hidden');
             backToMenuBtn.classList.add('hidden');
-
-            // Afficher l'écran de configuration
             setupScreenEl.classList.remove('hidden');
 
-             // Assurer que le sélecteur de section est dans l'état correct
-             const orderSelected = document.querySelector('input[name="order"]:checked') ? document.querySelector('input[name="order"]:checked').value : 'random';
-             sectionSelectorContainer.classList.toggle('hidden', orderSelected !== 'section');
-        }
-
-        // Initialisation au chargement de la page
-        function initializeApp() {
-             if (typeof flashcardsData === 'undefined' || !Array.isArray(flashcardsData) || flashcardsData.length === 0) {
-                 console.error("ERREUR CRITIQUE: flashcardsData est vide ou non défini.");
-                 document.body.innerHTML = '<h1 style="color:red; text-align:center;">Erreur: Impossible de charger les données des flashcards. Vérifiez la section &lt;script&gt; dans le fichier HTML.</h1>';
-                 return;
-             }
-            const essentialSetup = [setupScreenEl, mainContentEl, sectionSelectorContainer, sectionCheckboxesContainer, startSessionBtn, startConsultBtn];
-            const essentialQuiz = [flashcardContainerEl, completionMessageEl, questionArea, answerArea, showAnswerBtn, feedbackButtons, restartBtn, remainingCountEl, totalCountEl, validatedListEl, toReviewListEl, trackingListsContainerEl];
-            const essentialConsult = [consultNavButtons, prevBtn, nextBtn, currentCardNumEl, totalCardsConsultEl, showAnswerConsultBtn, backToMenuBtn];
-            if ([...essentialSetup, ...essentialQuiz, ...essentialConsult].some(el => !el)) {
-                 console.error("ERREUR CRITIQUE: Un ou plusieurs éléments HTML essentiels sont manquants. Vérifiez les ID.");
-                 alert("Erreur critique: Elements HTML manquants. Vérifiez la console.");
-                 return;
+            const savedState = loadQuizState();
+             const canResume = savedState && savedState.questionsToAsk && savedState.questionsToAsk.length > 0;
+             resumeQuizOptionEl.classList.toggle('hidden', !canResume);
+            if (canResume) {
+                 resumeInfoEl.textContent = `Quiz sauvegardé (${savedState.questionsToAsk.length} / ${savedState.originalTotal} restantes).`;
+                 newQuizTitleEl.textContent = "OU Commencer Nouvelle Session Quiz";
+            } else {
+                 newQuizTitleEl.textContent = "Nouvelle Session Quiz";
             }
 
+             const orderSelected = document.querySelector('input[name="order"]:checked') ? document.querySelector('input[name="order"]:checked').value : 'random';
+             sectionSelectorContainer.classList.toggle('hidden', orderSelected !== 'section');
+             if(consultStartCardInput) consultStartCardInput.value = ''; // Vider champ numéro carte
+        }
+
+        function initializeApp() {
+             if (typeof flashcardsData === 'undefined' || !Array.isArray(flashcardsData) || flashcardsData.length === 0) { console.error("ERREUR CRITIQUE: flashcardsData."); document.body.innerHTML = '<h1 style="color:red; text-align:center;">Erreur: Données flashcards manquantes.</h1>'; return; }
+             const essentialElements = [setupScreenEl, mainContentEl, flashcardContainerEl, completionMessageEl, questionArea, answerArea, showAnswerBtn, feedbackButtons, restartBtn, remainingCountEl, totalCountEl, validatedListEl, toReviewListEl, trackingListsContainerEl, sectionSelectorContainer, sectionCheckboxesContainer, startSessionBtn, startConsultBtn, resumeQuizOptionEl, resumeQuizBtn, resumeInfoEl, clearSaveBtn, consultNavButtons, prevBtn, nextBtn, currentCardNumEl, totalCardsConsultEl, showAnswerConsultBtn, backToMenuBtn, shuffleSectionsCheckbox, newQuizTitleEl, consultStartCardInput];
+             if (essentialElements.some(el => !el)) { console.error("ERREUR CRITIQUE: Elements HTML manquants."); alert("Erreur critique: Elements HTML manquants."); return; }
+
             populateSectionSelector();
-
-            // Gérer l'affichage/masquage du sélecteur de sections
-            document.querySelectorAll('input[name="order"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    sectionSelectorContainer.classList.toggle('hidden', this.value !== 'section');
-                });
-            });
-
-            // Afficher l'écran de configuration initial
-            showSetupScreen();
+            document.querySelectorAll('input[name="order"]').forEach(radio => { radio.addEventListener('change', function() { sectionSelectorContainer.classList.toggle('hidden', this.value !== 'section'); }); });
+            showSetupScreen(); // Afficher l'écran de configuration initial
         }
 
         // --- Écouteurs d'événements ---
-        if (showAnswerBtn) showAnswerBtn.addEventListener('click', handleShowAnswer); // Quiz
-        if (correctBtn) correctBtn.addEventListener('click', handleCorrect); // Quiz
-        if (incorrectBtn) incorrectBtn.addEventListener('click', handleIncorrect); // Quiz
-        if (restartBtn) restartBtn.addEventListener('click', showSetupScreen); // Quiz terminé -> Menu
-        if (startSessionBtn) startSessionBtn.addEventListener('click', startQuiz); // Lancer Quiz
-        if (startConsultBtn) startConsultBtn.addEventListener('click', startConsultationMode); // Lancer Consultation
-        if (prevBtn) prevBtn.addEventListener('click', handleConsultationPrevious); // Consult
-        if (nextBtn) nextBtn.addEventListener('click', handleConsultationNext); // Consult
-        if (showAnswerConsultBtn) showAnswerConsultBtn.addEventListener('click', handleShowAnswerConsult); // Consult
-        if (backToMenuBtn) backToMenuBtn.addEventListener('click', showSetupScreen); // Consult/Quiz terminé -> Menu
+        if (showAnswerBtn) showAnswerBtn.addEventListener('click', handleShowAnswer);
+        if (correctBtn) correctBtn.addEventListener('click', handleCorrect);
+        if (incorrectBtn) incorrectBtn.addEventListener('click', handleIncorrect);
+        if (restartBtn) restartBtn.addEventListener('click', showSetupScreen);
+        if (startSessionBtn) startSessionBtn.addEventListener('click', () => startQuiz(null));
+        if (resumeQuizBtn) resumeQuizBtn.addEventListener('click', resumeQuiz);
+        if (clearSaveBtn) clearSaveBtn.addEventListener('click', clearQuizState);
+        if (startConsultBtn) startConsultBtn.addEventListener('click', startConsultationMode);
+        if (prevBtn) prevBtn.addEventListener('click', handleConsultationPrevious);
+        if (nextBtn) nextBtn.addEventListener('click', handleConsultationNext);
+        if (showAnswerConsultBtn) showAnswerConsultBtn.addEventListener('click', handleShowAnswerConsult);
+        if (backToMenuBtn) backToMenuBtn.addEventListener('click', showSetupScreen);
+
+        window.addEventListener('beforeunload', () => { if (!isConsultationMode && questionsToAsk && questionsToAsk.length > 0) { saveQuizState(); } });
 
         document.addEventListener('DOMContentLoaded', initializeApp);
         // --- Fin du contenu de script.js ---
